@@ -1,5 +1,5 @@
 {
-	"name": "naija-faker",
+	"name": "@codegrenade/naija-faker",
 	"version": "1.0.0",
 	"description": "Naija Faker is a javascript library that generates fake typical nigerian data for you",
 	"main": "index.js",

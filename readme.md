@@ -5,19 +5,19 @@ Naija Faker is a javascript library that generates fake typical nigerian data ra
 Install the package in your existing project
 
 ```bash
-npm install naija-faker
+npm install @codegrenade/naija-faker
 ```
 
 ## Basic Usage/Examples
 Import or require the the package in your project to initialize the faker generator.
 
 ```javascript
-import faker from 'naija-faker'
+import faker from '@codegrenade/naija-faker'
 ```
 or 
 
 ```javascript
-const faker = require('naija-faker)
+const faker = require('@codegrenade/naija-faker)
 ```
 
 Configuration for data choice (**optional**)
