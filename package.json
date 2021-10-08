@@ -1,0 +1,35 @@
+{
+	"name": "naija-faker",
+	"version": "1.0.0",
+	"description": "Naija Faker is a javascript library that generates fake typical nigerian data for you",
+	"main": "index.js",
+	"scripts": {
+		"test": "node index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kodegrenade/naija-faker.git"
+	},
+	"keywords": [
+		"javacript",
+		"github",
+		"open source",
+		"faker",
+		"nodejs",
+		"javascript faker",
+		"nigerian faker",
+		"nigerian data",
+		"fake data",
+		"faker generator"
+	],
+	"author": {
+		"name": "Temitope Ayotunde",
+		"email": "brhamix@gmail.com"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/kodegrenade/naija-faker/issues"
+	},
+	"homepage": "https://github.com/kodegrenade/naija-faker#readme",
+	"dependencies": {}
+}
