@@ -3,7 +3,7 @@
 ## 2021-10-11, v1.0.3
 - New providers for address.
 - Generate email address from name.
-- New values added to person object.
+- New values are added to the person object.
 
 ## 2021-10-09, v1.0.2
 - Added test file.
