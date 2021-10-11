@@ -27,8 +27,8 @@ const faker = require('@codegrenade/naija-faker)
 
 Configuration for data choice (**optional**)
 
+> sets default language and gender for names to be generated and the local network provider for phone number
 ```javascript
-// sets default language and gender for names to be generated and the local network provider for phone number
 faker.config({
 	language: "yoruba",
 	gender: "male",
