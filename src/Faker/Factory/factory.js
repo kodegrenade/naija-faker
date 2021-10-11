@@ -113,14 +113,14 @@ class Factory
 	 * @returns {object} person
 	 */
 	static person(language, gender) {
-		let fullname = this.name(language || null, gender || null)
-		let splitName = fullname.split(" ")
+		let fullName = this.name(language || null, gender || null)
+		let splitName = fullName.split(" ")
 		return {
 			title: this.title(gender),
 			firstName: splitName[0],
 			lastName: splitName[1],
-			fullname: fullname,
-			email: this.email(fullname),
+			fullName: fullName,
+			email: this.email(fullName),
 			phone: this.phoneNumber(),
 			address: this.address(),
 		}
