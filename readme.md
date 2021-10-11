@@ -75,7 +75,8 @@ faker.person()
 > If you want a person of a particular language and gender
 
 ```javascript
-faker.person("hausa", "male") // returns person details of a male from the hausa language
+// returns person details of a male from the hausa language
+faker.person("hausa", "male") 
 ```
 
 
