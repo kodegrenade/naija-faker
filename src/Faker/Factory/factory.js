@@ -14,34 +14,56 @@ const lgas = require('../Providers/locations/Lgas')
 /**
  * Number Provider
  */
-const { networks, prefix } = require('../Providers/numbers/Numbers')
+const { networks, prefix } = require('../Providers/numbers')
 
 /**
  * Address Provider
  */
-const { types, locale } = require('../Providers/address/Address')
+const { types, suffixes, locale, places, names } = require('../Providers/address')
+
+/**
+ * Title Provider
+ */
+const { maleTitles, femaleTitles } = require('../Providers/title')
+
+/**
+ * Email Provider
+ */
+const { extensions } = require('../Providers/email')
 
 class Factory
 {
 	/**
-	 * Pick Name
+	 * Faker Configuration
+	 * @param {Object} options
+	 */
+	static config (options) {
+		if (typeof options === 'object' && typeof options !== undefined) {
+            this.language = (options.language) ? options.language.trim() : options.language
+            this.gender = (options.gender) ? options.gender.trim() : options.gender
+			this.network = (options.network) ? options.network.trim() : options.network
+        }
+	}
+
+	/**
+	 * Generates fake name
 	 * 
 	 * @param {string} language 
 	 * @param {string} gender 
 	 * @returns {string}
 	 */
-	static pickName(language, gender) {
+	static name(language, gender) {
 		const languageOptions  = [ "yoruba", "hausa", "igbo",]
 		const genderOptions = ["male", "female"]
 
 		let languagePicked = (language) 
-			? language : languageOptions[Math.floor(Math.random() * languageOptions.length)]
+			? language.trim() :(this.language ? this.language : languageOptions[Math.floor(Math.random() * languageOptions.length)])
 		let genderPicked = (gender) 
-			? gender : genderOptions[Math.floor(Math.random() * genderOptions.length)]
+			? gender.trim() :(this.gender ? this.gender : genderOptions[Math.floor(Math.random() * genderOptions.length)])
 
 		let firstName;
 		let lastName;
-
+		
 		switch (languagePicked) {
 			case "yoruba":
 				if (genderPicked == "male") {
@@ -86,70 +108,122 @@ class Factory
 	}
 
 	/**
-	 * Pick Person
+	 * Generates fake person data
 	 * 
-	 * @returns {object}
+	 * @returns {object} person
 	 */
-	static pickPerson() {
+	static person(language, gender) {
+		let fullname = this.name(language || null, gender || null)
+		let splitName = fullname.split(" ")
 		return {
-			name: this.pickName(),
-			phone: this.pickPhoneNumber(),
-			address: this.pickAddress()
+			title: this.title(gender),
+			firstName: splitName[0],
+			lastName: splitName[1],
+			fullname: fullname,
+			email: this.email(fullname),
+			phone: this.phoneNumber(),
+			address: this.address(),
 		}
 	}
 
 	/**
-	 * Pluck People
+	 * Generates fake people data
 	 * 
 	 * @param {integer} number
-	 * @returns {array}
+	 * @returns {array} people
 	 */
-	static pluckPeople(number) {
-		let count = (number) ? number : 1
+	static people(number) {
+		let count = (number) ? number : 10
 		let list = []
 		for (let index = 0; index < count; index++) {
-			const data = this.pickPerson();
+			const data = this.person();
 			list.push(data)
 		}
 		return list;
 	}
 
 	/**
-	 * Pick Title
+	 * Generates fake title
 	 * 
-	 * @returns {string}
+	 * @returns {string} title
 	 */
-	static pickTitle() {
+	static title(gender) {
+		const genders = ["male", "female"]
+		let selectedGender = (gender) 
+			? gender.trim() :(this.gender ? this.gender 
+			: genders[Math.floor(Math.random() * genders.length)])
+		
+		selectedGender = selectedGender.toLowerCase();
+		let title;
 
+		switch (selectedGender) {
+			case "male":
+					title = maleTitles[Math.floor(Math.random() * maleTitles.length)]
+					return title
+				break;
+			case "female":
+					title = femaleTitles[Math.floor(Math.random() * femaleTitles.length)]
+					return title
+				break;		
+			default:
+				return "no title selected"
+				break;
+		}
 	}
 
 	/**
-	 * Pick Address
+	 * Generates fake email address
 	 * 
-	 * @returns {string}
+	 * @param {string} name
+	 * @returns {string} email
 	 */
-	static pickAddress() {
+	static email(name) {
+		let value = (name) ? name.trim() : this.name()
+		const domain = extensions[Math.floor(Math.random() * extensions.length)]
+		const separators = [".", ""];
+		const separator = separators[Math.floor(Math.random() * separators.length)]
+		value = value.toLowerCase().replace(/[^A-Z0-9]+/ig, separator)
+		const address = `${value}${domain}`
+		return address
+	}
+
+	/**
+	 * Generates fake address
+	 * 
+	 * @returns {string} address
+	 */
+	static address() {
 		const addressType = types[Math.floor(Math.random() * types.length)];
 		const addressLocale = locale[Math.floor(Math.random() * locale.length)];
+		const placeList = places[0][addressLocale]
+		const addressName = (addressLocale) == "east" 
+			? this.name("igbo") :(addressLocale == "west" 
+			? this.name("yoruba") :(addressLocale == "south" 
+			? this.name("igbo") : this.name("hausa")))
 		const number = Math.floor((Math.random() * 200) + 1)
-		const fullAddress = `${number}, ${this.pickName(addressLocale)} ${addressType}`
-		return fullAddress
+		const addressSuffix = suffixes[Math.floor(Math.random() * suffixes.length)]
+		const addressPlace = placeList[Math.floor(Math.random() * placeList.length)]
+		const fullAddress = `${addressSuffix} ${number}, ${addressName} ${addressType}, ${addressPlace}`		
+		return fullAddress.trim()
 	}
 
 	/**
-	 * Pick Phone Number
+	 * Generates fake phone number
 	 * 
 	 * @param {string} network
-	 * @returns {string}
+	 * @returns {string} phone number
 	 */
-	static pickPhoneNumber(network) {
+	static phoneNumber(network) {
 		if (network && typeof network !== 'string' && typeof network !== undefined) {
             return 'String value expected for network.'
         }
 		
 		let wordCase = (network) 
-			? `${network.charAt(0).toUpperCase()}${network.slice(1)}` : networks[Math.floor(Math.random() * networks.length)]
+			? `${network.charAt(0).toUpperCase()}${network.slice(1).toLowerCase()}` 
+			:(this.network ? `${this.network.charAt(0).toUpperCase()}${this.network.slice(1).toLowerCase()}` 
+			: networks[Math.floor(Math.random() * networks.length)])
 		let index = networks.indexOf(wordCase)
+		
 		if(index < 0) {
 			return 'Invalid network type.'
 		}
@@ -157,8 +231,27 @@ class Factory
 		let selected = networks[index]
 		let prefixOptions = prefix[0][selected]
 		let selectedPrefix = prefixOptions[Math.floor(Math.random() * prefixOptions.length)]
-		const number = Math.floor((Math.random() * 10000000) + 1)
+		const number = Math.floor(1000000 + Math.random() * 9000000)
+		selectedPrefix = selectedPrefix.replace(/^0+/, '+234')		
 		return `${selectedPrefix}${number}`
+	}
+
+	/**
+	 * Generate nigerian states
+	 * 
+	 * @returns {array} states
+	 */
+	static states() {
+		return states["states"]
+	}
+
+	/**
+	 * Generates nigerian local governments
+	 * 
+	 * @returns {array} lgas
+	 */
+	static lgas() {
+		return lgas["lgas"]
 	}
 }
 

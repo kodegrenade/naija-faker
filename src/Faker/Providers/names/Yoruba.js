@@ -84,6 +84,7 @@ const yorubaMale = [
     "Oladele",
     "Olamide",
     "Obafemi",
+    "Oludele",
     "Ododo",
     "Oluwamayowa",
     "Olamilekan",    
@@ -123,6 +124,7 @@ const yorubaMale = [
     "Taiwo",
     "Temitope",
     "Sowore",
+    "Yemi",
 ]
 
 const yorubaFemale = [
@@ -187,6 +189,7 @@ const yorubaFemale = [
     "Olufunmilola",
     "Oluwafunmilayo",
     "Oluwakanyinsola",
+    "Oluwadunsin",
     "Oluwaseun",
     "Oluwatoyin",
     "Oluwayemisi",
@@ -200,6 +203,7 @@ const yorubaFemale = [
     "Simisola",
     "Taiwo",
     "Temitope",
+    "Teniola",
     "Titilayo",
     "Titilope",
     "Tiwa",
@@ -207,6 +211,7 @@ const yorubaFemale = [
     "Tifeoluwa",
     "Wuraola",
     "Yejide",
+    "Yemi",
     "Yetunde",
     "Yewande",
 ]

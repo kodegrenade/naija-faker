@@ -1,4 +1,9 @@
 # Naija Faker
+
+[![npm (scoped)](https://img.shields.io/npm/v/@codegrenade/naija-faker.svg)](https://www.npmjs.com/package/@codegrenade/naija-faker)
+[![npm (scoped)](https://img.shields.io/badge/npm-%40codegrenade%2Fnaija--faker-brightgreen.svg)](https://www.npmjs.com/package/@codegrenade/naija-faker)
+[![npm (scoped)](https://img.shields.io/npm/l/@codegrenade/naija-faker)](https://www.npmjs.com/package/@codegrenade/naija-faker)
+
 Naija Faker is a javascript library that generates fake typical nigerian data ranging from `name`, `address`, `phone number`, `lgas` and `states` for you.
 
 ## Installation
@@ -23,13 +28,14 @@ const faker = require('@codegrenade/naija-faker)
 Configuration for data choice (**optional**)
 
 ```javascript
+// sets default language and gender for names to be generated
 faker.config({
 	language: "yoruba",
 	gender: "male",
 })
 
-NB: `yoruba`, `igbo` and `hausa` are the only languages supported at the moment.
 ```
+> NB: `Yoruba`, `Igbo` and `Hausa` are the only nigerian languages supported at the moment.
 
 Generate fake data by calling methods
 
@@ -46,7 +52,7 @@ faker.person()
 // object of person details
 {
   name: "Abosede Oyedele", 
-  phone: "08123456789", 
+  phone: "+2348123456789", 
   address: "11, Odewale Avenue, Kwara"
 }
 ```
@@ -60,7 +66,7 @@ faker.people()
 	{
 		name: "Temitayo Odewale",
 		phone: "+2348012895678",
-		address: "15, Olamilekan Avenue"
+		address: "5, Dominion Way"
 	},
 	{
 		name: "Abikoye Oluwaseun",
@@ -70,7 +76,7 @@ faker.people()
 	{
 		name : "Ayodele Babatunde",
 		phone: "+2349023456734",
-		address: "",
+		address: "85, Fadele Crescent",
 	}
 ]
 ```

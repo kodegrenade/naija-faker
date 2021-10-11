@@ -4,7 +4,7 @@
 	"description": "Naija Faker is a javascript library that generates fake typical nigerian data for you",
 	"main": "index.js",
 	"scripts": {
-		"test": "node index.js"
+		"test": "mocha tests/index.test.js"
 	},
 	"repository": {
 		"type": "git",
@@ -31,5 +31,7 @@
 		"url": "https://github.com/kodegrenade/naija-faker/issues"
 	},
 	"homepage": "https://github.com/kodegrenade/naija-faker#readme",
-	"dependencies": {}
+	"dependencies": {
+		"mocha": "^9.1.2"
+	}
 }

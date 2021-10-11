@@ -3,5 +3,5 @@
  * Author: Temitope Ayotunde [@codegrenade]
  * License: MIT
  */
-const faker = require('./src/Faker/faker')
+const faker = require('./src/Factory/factory')
 module.exports = faker
