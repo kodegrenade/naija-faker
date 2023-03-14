@@ -109,7 +109,7 @@ faker.people()
 > The `people` method returns 10 persons by default. If you want more persons to be returned by the method, use the example below.
 
 ```javascript
-faker.peole(20) // returns 20 persons in the array
+faker.people(20) // returns 20 persons in the array
 ```
 
 ### Specifing desired parameter values
