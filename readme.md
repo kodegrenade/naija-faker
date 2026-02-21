@@ -4,7 +4,17 @@
 [![npm (scoped)](https://img.shields.io/badge/npm-%40codegrenade%2Fnaija--faker-brightgreen.svg)](https://www.npmjs.com/package/@codegrenade/naija-faker)
 [![npm (scoped)](https://img.shields.io/npm/l/@codegrenade/naija-faker)](https://www.npmjs.com/package/@codegrenade/naija-faker)
 
-Naija Faker is a javascript library that generates fake typical nigerian data ranging from `name`, `address`, `phone number`, `lgas` and `states` for you.
+Naija Faker is a javascript library that generates fake typical Nigerian data ranging from `name`, `address`, `phone number`, `lgas` and `states` for you. It supports **Yoruba**, **Igbo**, and **Hausa** ethnic groups with culturally authentic data.
+
+## Features
+- 🇳🇬 Authentic Nigerian names (Yoruba, Igbo, Hausa)
+- 📱 Phone numbers for all 4 major networks (MTN, Glo, Airtel, 9mobile)
+- 📍 Addresses across all Nigerian regions
+- 🏛️ All 37 states (36 states + FCT)
+- 🏘️ 774 Local Government Areas
+- 👑 Nigerian-specific titles (Chief, Alhaji, Oba, Emir, Igwe, and more)
+- 📝 TypeScript support with full IntelliSense
+- 🤖 AI/LLM integration via `schema.json` and `describe()` method
 
 ## Installation
 Install the package in your existing project
@@ -22,7 +32,7 @@ import faker from '@codegrenade/naija-faker'
 or 
 
 ```javascript
-const faker = require('@codegrenade/naija-faker)
+const faker = require('@codegrenade/naija-faker')
 ```
 
 Configuration for data choice (**optional**)
@@ -51,9 +61,9 @@ faker.phoneNumber() // 09123456634
 
 faker.email() // temilade.abolade@ymail.com
 
-faker.states() // array of states in Nigeria
+faker.states() // array of states in Nigeria (36 states + FCT)
 
-faker.lgas() // array of states in Nigeria
+faker.lgas() // array of local government areas in Nigeria
 ```
 
 ```javascript
@@ -128,6 +138,42 @@ faker.phoneNumber("mtn")
 
 // returns an email address from the name supplied
 faker.email("Aboderin Joshua")
+```
+
+## TypeScript Support
+
+Naija Faker ships with TypeScript declarations out of the box. You get full IntelliSense and type checking with no additional setup.
+
+```typescript
+import faker from '@codegrenade/naija-faker'
+
+const person = faker.person("yoruba", "female")
+// Full autocomplete for person.title, person.firstName, etc.
+```
+
+## AI/LLM Integration
+
+Naija Faker is designed to work seamlessly with AI agents and LLM-powered development tools.
+
+### Runtime Introspection
+
+Use the `describe()` method to discover available methods at runtime:
+
+```javascript
+// Get schema for all methods
+faker.describe()
+
+// Get schema for a specific method
+faker.describe('person')
+// Returns: { name: 'person', description: '...', parameters: [...], returns: {...}, example: {...} }
+```
+
+### Schema File
+
+A `schema.json` file is included in the package, providing a full JSON Schema description of the API. AI agents can use this for tool discovery:
+
+```javascript
+const schema = require('@codegrenade/naija-faker/schema.json')
 ```
 
 ## Contributing

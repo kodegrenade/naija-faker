@@ -1,0 +1,316 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "naija-faker",
+  "description": "Nigerian data faker library - generates fake Nigerian names, addresses, phone numbers, emails, and more. All data is culturally authentic, covering Yoruba, Igbo, and Hausa ethnic groups.",
+  "version": "1.0.5",
+  "type": "object",
+  "methods": [
+    {
+      "name": "config",
+      "description": "Set default configuration for all subsequent data generation calls. Persists language, gender, and network preferences.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "object",
+          "required": true,
+          "description": "Configuration object",
+          "properties": {
+            "language": {
+              "type": "string",
+              "enum": [
+                "yoruba",
+                "igbo",
+                "hausa"
+              ],
+              "description": "Default Nigerian language/ethnicity for name generation"
+            },
+            "gender": {
+              "type": "string",
+              "enum": [
+                "male",
+                "female"
+              ],
+              "description": "Default gender for name and title generation"
+            },
+            "network": {
+              "type": "string",
+              "enum": [
+                "mtn",
+                "glo",
+                "airtel",
+                "9mobile"
+              ],
+              "description": "Default mobile network provider for phone numbers"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "type": "void",
+        "description": "Sets internal defaults, no return value"
+      },
+      "example": {
+        "call": "faker.config({ language: 'yoruba', gender: 'male', network: 'mtn' })",
+        "result": null
+      }
+    },
+    {
+      "name": "name",
+      "description": "Generate a fake Nigerian full name (first name + last name) from the specified or random ethnic group.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Nigerian language/ethnicity. Random if not specified."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender for gendered first names. Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Full name string, e.g. 'Adebayo Ogunlesi'"
+      },
+      "example": {
+        "call": "faker.name('yoruba', 'male')",
+        "result": "Akintunde Owoyele"
+      }
+    },
+    {
+      "name": "person",
+      "description": "Generate a complete fake Nigerian person with title, name, email, phone, and address.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Nigerian language/ethnicity for the person's name"
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender for name and title"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Person object with keys: title, firstName, lastName, fullName, email, phone, address",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        }
+      },
+      "example": {
+        "call": "faker.person('hausa', 'female')",
+        "result": {
+          "title": "Alhaja",
+          "firstName": "Halima",
+          "lastName": "Ibrahim",
+          "fullName": "Halima Ibrahim",
+          "email": "halima.ibrahim@gmail.com",
+          "phone": "+2348031234567",
+          "address": "Plot 15, Usman Danladi Avenue, Kaduna"
+        }
+      }
+    },
+    {
+      "name": "people",
+      "description": "Generate an array of fake Nigerian persons. Each person has complete identity data.",
+      "parameters": [
+        {
+          "name": "number",
+          "type": "integer",
+          "required": false,
+          "description": "Number of people to generate. Defaults to 10."
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "Array of Person objects"
+      },
+      "example": {
+        "call": "faker.people(5)",
+        "result": "[...5 person objects]"
+      }
+    },
+    {
+      "name": "title",
+      "description": "Generate a Nigerian title/honorific. Includes culturally significant titles like Chief, Alhaji, Oba, Emir, Igwe.",
+      "parameters": [
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender-specific title. Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Title string, e.g. 'Chief', 'Alhaji', 'Dr.'"
+      },
+      "example": {
+        "call": "faker.title('male')",
+        "result": "Chief"
+      }
+    },
+    {
+      "name": "email",
+      "description": "Generate a fake email address, optionally based on a provided name.",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "description": "Name to base the email on. If not provided, a random name is used."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Email address string"
+      },
+      "example": {
+        "call": "faker.email('Ngozi Okonkwo')",
+        "result": "ngozi.okonkwo@gmail.com"
+      }
+    },
+    {
+      "name": "address",
+      "description": "Generate a fake Nigerian street address with number, name, type, and city.",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "Full address string"
+      },
+      "example": {
+        "call": "faker.address()",
+        "result": "45, Alhaji Kazeem Street, Kaduna"
+      }
+    },
+    {
+      "name": "phoneNumber",
+      "description": "Generate a fake Nigerian phone number in +234 international format.",
+      "parameters": [
+        {
+          "name": "network",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "mtn",
+            "glo",
+            "airtel",
+            "9mobile"
+          ],
+          "description": "Mobile network provider. Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Phone number in +234 format"
+      },
+      "example": {
+        "call": "faker.phoneNumber('mtn')",
+        "result": "+2348031234567"
+      }
+    },
+    {
+      "name": "states",
+      "description": "Get all 37 Nigerian states (36 states + Federal Capital Territory).",
+      "parameters": [],
+      "returns": {
+        "type": "array",
+        "description": "Array of 37 state name strings"
+      },
+      "example": {
+        "call": "faker.states()",
+        "result": [
+          "Abia",
+          "Adamawa",
+          "..."
+        ]
+      }
+    },
+    {
+      "name": "lgas",
+      "description": "Get all 774 Nigerian Local Government Areas (LGAs).",
+      "parameters": [],
+      "returns": {
+        "type": "array",
+        "description": "Array of LGA name strings"
+      },
+      "example": {
+        "call": "faker.lgas()",
+        "result": [
+          "Aba North",
+          "Aba South",
+          "..."
+        ]
+      }
+    },
+    {
+      "name": "describe",
+      "description": "Get API schema for AI/LLM tool integration. Returns structured descriptions of all available methods.",
+      "parameters": [
+        {
+          "name": "method",
+          "type": "string",
+          "required": false,
+          "description": "Specific method name to describe. Returns all methods if not specified."
+        }
+      ],
+      "returns": {
+        "type": "array|object|null",
+        "description": "Array of method schemas, a single method schema, or null if method not found"
+      },
+      "example": {
+        "call": "faker.describe('name')",
+        "result": "{ method: 'name', description: '...', parameters: [...], returns: {...} }"
+      }
+    }
+  ]
+}
