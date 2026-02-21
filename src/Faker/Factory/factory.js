@@ -36,6 +36,11 @@ const { extensions } = require('../Providers/email')
  */
 const { banks } = require('../Providers/bank')
 
+/**
+ * Geo Provider
+ */
+const { regionMap, stateLgas, languageToRegions } = require('../Providers/geo')
+
 class Factory {
   /**
    * Internal PRNG state
@@ -348,6 +353,84 @@ class Factory {
       bankCode: bank.code,
       accountNumber: accountNumber,
     }
+  }
+
+  /**
+   * Generates a geographically consistent fake Nigerian person.
+   * All fields (name, title, address, state, lga) are coherent.
+   * 
+   * @param {string} language - "yoruba", "igbo", or "hausa" (optional, random if not set)
+   * @param {string} gender - "male" or "female" (optional, random if not set)
+   * @returns {object} Consistent person with state and lga fields
+   */
+  static consistentPerson(language, gender) {
+    const languageOptions = ["yoruba", "hausa", "igbo"]
+    const genderOptions = ["male", "female"]
+
+    let lang = (language)
+      ? language.trim().toLowerCase()
+      : (this.language ? this.language
+        : languageOptions[Math.floor(this._random() * languageOptions.length)])
+    let gen = (gender)
+      ? gender.trim().toLowerCase()
+      : (this.gender ? this.gender
+        : genderOptions[Math.floor(this._random() * genderOptions.length)])
+
+    // Get matching regions for this language
+    const regions = languageToRegions[lang]
+    if (!regions) {
+      return 'Invalid language. Use "yoruba", "igbo", or "hausa".'
+    }
+
+    const region = regions[Math.floor(this._random() * regions.length)]
+    const regionData = regionMap[region]
+    const state = regionData.states[Math.floor(this._random() * regionData.states.length)]
+    const lgaList = stateLgas[state]
+    const lga = lgaList
+      ? lgaList[Math.floor(this._random() * lgaList.length)]
+      : null
+
+    // Get address from the matching region
+    const addressPlaces = places[0][region]
+    const addressType = types[Math.floor(this._random() * types.length)]
+    const addressSuffix = suffixes[Math.floor(this._random() * suffixes.length)]
+    const addressNumber = Math.floor((this._random() * 200) + 1)
+    const addressName = this.name(lang)
+    const addressPlace = addressPlaces[Math.floor(this._random() * addressPlaces.length)]
+    const fullAddress = `${addressSuffix} ${addressNumber}, ${addressName} ${addressType}, ${addressPlace}`.trim()
+
+    const fullName = this.name(lang, gen)
+    const splitName = fullName.split(' ')
+
+    return {
+      title: this.title(gen),
+      firstName: splitName[0],
+      lastName: splitName[1],
+      fullName: fullName,
+      email: this.email(fullName),
+      phone: this.phoneNumber(),
+      address: fullAddress,
+      state: state,
+      lga: lga,
+    }
+  }
+
+  /**
+   * Generates multiple geographically consistent fake Nigerian persons.
+   * 
+   * @param {number} number - Number of people (default: 10)
+   * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
+   * @param {string} gender - "male" or "female" (optional)
+   * @returns {array} Array of consistent person objects
+   */
+  static consistentPeople(number, language, gender) {
+    let count = (number) ? number : 10
+    let list = []
+    for (let index = 0; index < count; index++) {
+      const data = this.consistentPerson(language || null, gender || null)
+      list.push(data)
+    }
+    return list
   }
 
   /**

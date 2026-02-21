@@ -13,6 +13,9 @@ Naija Faker is a javascript library that generates fake typical Nigerian data ra
 - 🏛️ All 37 states (36 states + FCT)
 - 🏘️ 774 Local Government Areas
 - 👑 Nigerian-specific titles (Chief, Alhaji, Oba, Emir, Igwe, and more)
+- 🏦 BVN, NIN, and bank account generation (26 Nigerian banks)
+- 🎯 Geographically consistent identities (name + state + LGA all match)
+- 🎲 Seeded deterministic generation for reproducible tests
 - 📝 TypeScript support with full IntelliSense
 - 🤖 AI/LLM integration via `schema.json` and `describe()` method
 
@@ -141,12 +144,58 @@ faker.email("Aboderin Joshua")
 
 // returns a bank account details
 faker.bankAccount()
+// → { bankName: 'Zenith Bank', bankCode: '057', accountNumber: '1234567890' }
 
-// returns a BVN
-faker.bvn()
+// returns a bank account for a specific bank
+faker.bankAccount("Access Bank")
 
-// returns a NIN
-faker.nin()
+// returns a BVN (11-digit Bank Verification Number)
+faker.bvn() // → '22312345678'
+
+// returns a NIN (11-digit National Identification Number)
+faker.nin() // → '98765432101'
+```
+
+## Seeded Generation
+
+Use `faker.seed()` for reproducible output — perfect for snapshot testing and consistent test fixtures.
+
+```javascript
+faker.seed(12345)
+faker.name("yoruba", "male") // Always returns the same name
+faker.person("igbo")         // Always returns the same person
+
+faker.seed(12345)            // Reset to same seed
+faker.name("yoruba", "male") // Identical output as above
+
+faker.seed()                 // Reset to non-deterministic mode
+```
+
+## Consistent Identities
+
+Generate persons where name ethnicity, address, state, and LGA are all geographically coherent.
+
+```javascript
+faker.consistentPerson("yoruba", "male")
+
+// → All fields match: Yoruba name, western address, western state, matching LGA
+{
+  title: 'Chief',
+  firstName: 'Adebayo',
+  lastName: 'Ogunlesi',
+  fullName: 'Adebayo Ogunlesi',
+  email: 'adebayo.ogunlesi@gmail.com',
+  phone: '+2348031234567',
+  address: 'Plot 45, Oluwaseun Adedayo Street, Ibadan',
+  state: 'Oyo',
+  lga: 'Ibadan North'
+}
+```
+
+```javascript
+// Generate multiple consistent people
+faker.consistentPeople(5, "hausa", "female")
+// → 5 Hausa female persons, all with northern states and matching LGAs
 ```
 
 ## TypeScript Support

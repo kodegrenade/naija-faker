@@ -293,6 +293,173 @@
       }
     },
     {
+      "name": "seed",
+      "description": "Set a seed for deterministic output. All subsequent calls will produce identical results for the same seed. Call without arguments to reset to non-deterministic mode.",
+      "parameters": [
+        {
+          "name": "value",
+          "type": "integer",
+          "required": false,
+          "description": "Seed number. Omit to reset to random."
+        }
+      ],
+      "returns": {
+        "type": "void",
+        "description": "Sets internal PRNG state"
+      },
+      "example": {
+        "call": "faker.seed(12345)",
+        "result": null
+      }
+    },
+    {
+      "name": "bvn",
+      "description": "Generate a fake 11-digit Bank Verification Number (BVN).",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "11-digit BVN string"
+      },
+      "example": {
+        "call": "faker.bvn()",
+        "result": "22312345678"
+      }
+    },
+    {
+      "name": "nin",
+      "description": "Generate a fake 11-digit National Identification Number (NIN).",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "11-digit NIN string"
+      },
+      "example": {
+        "call": "faker.nin()",
+        "result": "98765432101"
+      }
+    },
+    {
+      "name": "bankAccount",
+      "description": "Generate a fake Nigerian bank account with bank name, CBN code, and 10-digit NUBAN account number.",
+      "parameters": [
+        {
+          "name": "bankName",
+          "type": "string",
+          "required": false,
+          "description": "Specific bank name (e.g., 'Zenith Bank'). Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Bank account object with bankName, bankCode, accountNumber",
+        "properties": {
+          "bankName": {
+            "type": "string"
+          },
+          "bankCode": {
+            "type": "string"
+          },
+          "accountNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "example": {
+        "call": "faker.bankAccount('Zenith Bank')",
+        "result": {
+          "bankName": "Zenith Bank",
+          "bankCode": "057",
+          "accountNumber": "1234567890"
+        }
+      }
+    },
+    {
+      "name": "consistentPerson",
+      "description": "Generate a geographically consistent fake Nigerian person. Name ethnicity, title, address, state, and LGA are all coherent.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Nigerian language/ethnicity. Random if not specified."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender for name and title."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "ConsistentPerson with title, name, email, phone, address, state, lga — all geographically coherent"
+      },
+      "example": {
+        "call": "faker.consistentPerson('yoruba', 'male')",
+        "result": {
+          "title": "Chief",
+          "firstName": "Adebayo",
+          "lastName": "Ogunlesi",
+          "fullName": "Adebayo Ogunlesi",
+          "email": "adebayo.ogunlesi@gmail.com",
+          "phone": "+2348031234567",
+          "address": "Plot 45, Oluwaseun Adedayo Street, Ibadan",
+          "state": "Oyo",
+          "lga": "Ibadan North"
+        }
+      }
+    },
+    {
+      "name": "consistentPeople",
+      "description": "Generate multiple geographically consistent fake Nigerian persons.",
+      "parameters": [
+        {
+          "name": "number",
+          "type": "integer",
+          "required": false,
+          "description": "Number of people to generate. Defaults to 10."
+        },
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Nigerian language/ethnicity for all people."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender for all people."
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "Array of ConsistentPerson objects"
+      },
+      "example": {
+        "call": "faker.consistentPeople(5, 'hausa', 'male')",
+        "result": "[...5 consistent person objects]"
+      }
+    },
+    {
       "name": "describe",
       "description": "Get API schema for AI/LLM tool integration. Returns structured descriptions of all available methods.",
       "parameters": [

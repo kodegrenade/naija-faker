@@ -31,10 +31,32 @@ interface Person {
 }
 
 /**
+ * A geographically consistent person with state and LGA
+ */
+interface ConsistentPerson extends Person {
+  /** Nigerian state matching the person's ethnicity/region */
+  state: string;
+  /** Local Government Area within the person's state */
+  lga: string | null;
+}
+
+/**
+ * A generated bank account object
+ */
+interface BankAccount {
+  /** Bank name (e.g., "Access Bank", "Zenith Bank") */
+  bankName: string;
+  /** CBN bank code */
+  bankCode: string;
+  /** 10-digit NUBAN account number */
+  accountNumber: string;
+}
+
+/**
  * API method schema for AI/LLM integration
  */
 interface MethodSchema {
-  method: string;
+  name: string;
   description: string;
   parameters: Array<{
     name: string;
@@ -64,6 +86,12 @@ interface NaijaFaker {
   config(options: FakerConfig): void;
 
   /**
+   * Set a seed for deterministic output. Call without arguments to reset.
+   * @param value - Seed number (omit to reset to non-deterministic)
+   */
+  seed(value?: number): void;
+
+  /**
    * Generate a fake Nigerian name
    * @param language - Nigerian language: "yoruba", "igbo", or "hausa"
    * @param gender - "male" or "female"
@@ -85,6 +113,23 @@ interface NaijaFaker {
    * @returns Array of Person objects
    */
   people(number?: number): Person[];
+
+  /**
+   * Generate a geographically consistent fake Nigerian person
+   * @param language - Nigerian language: "yoruba", "igbo", or "hausa"
+   * @param gender - "male" or "female"
+   * @returns ConsistentPerson with coherent state, LGA, and address
+   */
+  consistentPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): ConsistentPerson;
+
+  /**
+   * Generate multiple geographically consistent fake Nigerian persons
+   * @param number - Number of people (default: 10)
+   * @param language - Nigerian language: "yoruba", "igbo", or "hausa"
+   * @param gender - "male" or "female"
+   * @returns Array of ConsistentPerson objects
+   */
+  consistentPeople(number?: number, language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): ConsistentPerson[];
 
   /**
    * Generate a Nigerian title/honorific
@@ -112,6 +157,25 @@ interface NaijaFaker {
    * @returns Phone number string in +234 format
    */
   phoneNumber(network?: "mtn" | "glo" | "airtel" | "9mobile"): string;
+
+  /**
+   * Generate a fake BVN (Bank Verification Number)
+   * @returns 11-digit BVN string
+   */
+  bvn(): string;
+
+  /**
+   * Generate a fake NIN (National Identification Number)
+   * @returns 11-digit NIN string
+   */
+  nin(): string;
+
+  /**
+   * Generate a fake Nigerian bank account
+   * @param bankName - Optional specific bank name
+   * @returns BankAccount object with bankName, bankCode, accountNumber
+   */
+  bankAccount(bankName?: string): BankAccount;
 
   /**
    * Get all Nigerian states (36 states + FCT)
