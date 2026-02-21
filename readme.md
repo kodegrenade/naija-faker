@@ -138,6 +138,15 @@ faker.phoneNumber("mtn")
 
 // returns an email address from the name supplied
 faker.email("Aboderin Joshua")
+
+// returns a bank account details
+faker.bankAccount()
+
+// returns a BVN
+faker.bvn()
+
+// returns a NIN
+faker.nin()
 ```
 
 ## TypeScript Support
