@@ -44,6 +44,18 @@ interface ConsistentPerson extends Person {
  * A detailed person with education, work, and vehicle records
  */
 interface DetailedPerson extends ConsistentPerson {
+  /** Date of birth and age */
+  dateOfBirth: { date: string; age: number };
+  /** Marital status */
+  maritalStatus: string;
+  /** Blood group */
+  bloodGroup: string;
+  /** Genotype */
+  genotype: string;
+  /** Salary details */
+  salary: { amount: number; currency: string; level: string; frequency: string };
+  /** Next of kin information */
+  nextOfKin: { fullName: string; relationship: string; phone: string; address: string };
   /** Education record */
   education: EducationRecord;
   /** Work/employment record */
@@ -272,6 +284,41 @@ interface NaijaFaker {
    * Generate a fake vehicle record
    */
   vehicleRecord(state?: string): VehicleRecord;
+
+  /**
+   * Generate a fake date of birth with age
+   */
+  dateOfBirth(options?: { minAge?: number; maxAge?: number }): { date: string; age: number };
+
+  /**
+   * Generate a random marital status
+   */
+  maritalStatus(): string;
+
+  /**
+   * Generate a random blood group
+   */
+  bloodGroup(): string;
+
+  /**
+   * Generate a random genotype
+   */
+  genotype(): string;
+
+  /**
+   * Generate a fake salary
+   */
+  salary(options?: { level?: "entry" | "mid" | "senior" | "executive" }): { amount: number; currency: string; level: string; frequency: string };
+
+  /**
+   * Generate a fake next of kin
+   */
+  nextOfKin(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): { fullName: string; relationship: string; phone: string; address: string };
+
+  /**
+   * Export generated data as JSON or CSV string
+   */
+  export(type?: "person" | "detailedPerson" | "consistentPerson", count?: number, format?: "json" | "csv"): string;
 
   /**
    * Get all Nigerian states (36 states + FCT)

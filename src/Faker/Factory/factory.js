@@ -66,6 +66,16 @@ const { vehicleMakes, vehicleColors } = require('../Providers/vehicles')
  */
 const { positions, degrees, courses } = require('../Providers/jobs')
 
+/**
+ * Medical Provider
+ */
+const { bloodGroups, genotypes } = require('../Providers/medical')
+
+/**
+ * Salary Provider
+ */
+const { salaryBands, levels } = require('../Providers/salary')
+
 class Factory {
   /**
    * Internal PRNG state
@@ -597,12 +607,12 @@ class Factory {
   }
 
   /**
-   * Generates a detailed fake Nigerian person with education, work, and vehicle records.
+   * Generates a detailed fake Nigerian person with personal data, education, work, and vehicle records.
    * Uses consistentPerson() internally for geographic coherence.
    * 
    * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
    * @param {string} gender - "male" or "female" (optional)
-   * @returns {object} Rich identity with person + education + work + vehicle
+   * @returns {object} Rich identity with person + personal data + education + work + vehicle
    */
   static detailedPerson(language, gender) {
     const person = this.consistentPerson(language || null, gender || null)
@@ -622,8 +632,18 @@ class Factory {
     const work = this.workRecord()
     const vehicle = this.vehicleRecord(person.state)
 
+    // Determine the opposite gender for next of kin variety
+    const personGender = gender ? gender.trim().toLowerCase() : null
+    const kinGender = (personGender === 'male') ? 'female' : (personGender === 'female') ? 'male' : null
+
     return {
       ...person,
+      dateOfBirth: this.dateOfBirth(),
+      maritalStatus: this.maritalStatus(),
+      bloodGroup: this.bloodGroup(),
+      genotype: this.genotype(),
+      salary: this.salary(),
+      nextOfKin: this.nextOfKin(lang, kinGender),
       education: education,
       work: work,
       vehicle: vehicle,
@@ -646,6 +666,182 @@ class Factory {
       list.push(data)
     }
     return list
+  }
+
+  /**
+   * Generates a fake date of birth with age
+   * 
+   * @param {object} options - Optional { minAge, maxAge } (defaults: 18, 65)
+   * @returns {object} { date, age }
+   */
+  static dateOfBirth(options) {
+    const minAge = (options && options.minAge !== undefined) ? options.minAge : 18
+    const maxAge = (options && options.maxAge !== undefined) ? options.maxAge : 65
+    const age = minAge + Math.floor(this._random() * (maxAge - minAge + 1))
+
+    const now = new Date()
+    const birthYear = now.getFullYear() - age
+    const month = Math.floor(this._random() * 12)
+    const day = Math.floor(this._random() * 28) + 1
+    const date = new Date(birthYear, month, day)
+
+    const yyyy = date.getFullYear()
+    const mm = String(date.getMonth() + 1).padStart(2, '0')
+    const dd = String(date.getDate()).padStart(2, '0')
+
+    return {
+      date: `${yyyy}-${mm}-${dd}`,
+      age: age,
+    }
+  }
+
+  /**
+   * Generates a random marital status
+   * 
+   * @returns {string} Marital status
+   */
+  static maritalStatus() {
+    const statuses = ["Single", "Married", "Divorced", "Widowed", "Separated"]
+    return statuses[Math.floor(this._random() * statuses.length)]
+  }
+
+  /**
+   * Generates a random blood group
+   * 
+   * @returns {string} Blood group e.g. "O+"
+   */
+  static bloodGroup() {
+    return bloodGroups[Math.floor(this._random() * bloodGroups.length)]
+  }
+
+  /**
+   * Generates a random genotype
+   * 
+   * @returns {string} Genotype e.g. "AA", "AS", "SS"
+   */
+  static genotype() {
+    return genotypes[Math.floor(this._random() * genotypes.length)]
+  }
+
+  /**
+   * Generates a fake salary
+   * 
+   * @param {object} options - Optional { level: "entry"|"mid"|"senior"|"executive" }
+   * @returns {object} { amount, currency, level, frequency }
+   */
+  static salary(options) {
+    const level = (options && options.level)
+      ? options.level.toLowerCase()
+      : levels[Math.floor(this._random() * levels.length)]
+
+    const band = salaryBands[level]
+    if (!band) {
+      return 'Invalid level. Use "entry", "mid", "senior", or "executive".'
+    }
+
+    const amount = Math.floor(band.min + this._random() * (band.max - band.min))
+    // Round to nearest 1000
+    const rounded = Math.round(amount / 1000) * 1000
+
+    return {
+      amount: rounded,
+      currency: "NGN",
+      level: level,
+      frequency: "monthly",
+    }
+  }
+
+  /**
+   * Generates a fake next of kin
+   * 
+   * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
+   * @param {string} gender - "male" or "female" for the kin (optional)
+   * @returns {object} { fullName, relationship, phone, address }
+   */
+  static nextOfKin(language, gender) {
+    const maleRelationships = ["Father", "Brother", "Spouse", "Uncle", "Son"]
+    const femaleRelationships = ["Mother", "Sister", "Spouse", "Aunt", "Daughter"]
+
+    const genderOptions = ["male", "female"]
+    const gen = (gender)
+      ? gender.trim().toLowerCase()
+      : genderOptions[Math.floor(this._random() * genderOptions.length)]
+
+    const relationships = (gen === "female") ? femaleRelationships : maleRelationships
+    const relationship = relationships[Math.floor(this._random() * relationships.length)]
+    const fullName = this.name(language || null, gen)
+
+    return {
+      fullName: fullName,
+      relationship: relationship,
+      phone: this.phoneNumber(),
+      address: this.address(),
+    }
+  }
+
+  /**
+   * Exports generated data as JSON or CSV string
+   * 
+   * @param {string} type - "person", "detailedPerson", or "consistentPerson"
+   * @param {number} count - Number of records (default: 10)
+   * @param {string} format - "json" or "csv" (default: "json")
+   * @returns {string} Formatted data string
+   */
+  static export(type, count, format) {
+    const num = count || 10
+    const fmt = (format) ? format.toLowerCase() : 'json'
+
+    const generators = {
+      'person': () => this.people(num),
+      'detailedperson': () => this.detailedPeople(num),
+      'consistentperson': () => this.consistentPeople(num),
+    }
+
+    const generatorKey = type ? type.toLowerCase() : 'person'
+    const generator = generators[generatorKey]
+    if (!generator) {
+      return 'Invalid type. Use "person", "detailedPerson", or "consistentPerson".'
+    }
+
+    const data = generator()
+
+    if (fmt === 'csv') {
+      return this._toCSV(data)
+    }
+
+    return JSON.stringify(data, null, 2)
+  }
+
+  /**
+   * Converts array of objects to CSV string
+   * @private
+   */
+  static _toCSV(data) {
+    if (!data || data.length === 0) return ''
+
+    const flattenObject = (obj, prefix = '') => {
+      const result = {}
+      for (const [key, value] of Object.entries(obj)) {
+        const newKey = prefix ? `${prefix}.${key}` : key
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          Object.assign(result, flattenObject(value, newKey))
+        } else {
+          result[newKey] = value
+        }
+      }
+      return result
+    }
+
+    const flatData = data.map(item => flattenObject(item))
+    const headers = Object.keys(flatData[0])
+    const rows = flatData.map(item =>
+      headers.map(h => {
+        const val = item[h] !== undefined ? String(item[h]) : ''
+        return val.includes(',') ? `"${val}"` : val
+      }).join(',')
+    )
+
+    return [headers.join(','), ...rows].join('\n')
   }
 
   /**

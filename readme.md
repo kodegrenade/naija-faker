@@ -17,6 +17,10 @@ Naija Faker is a javascript library that generates fake typical Nigerian data ra
 - 🚗 License plates, companies, and 42 Nigerian universities
 - 🎯 Geographically consistent identities (name + state + LGA all match)
 - 💼 Detailed persons with education, work, and vehicle records
+- 🩸 Date of birth, blood group, genotype, marital status
+- 💰 Salary generation with level-based income bands
+- 👨‍👩‍👧 Next of kin generation
+- 📦 Bulk export to JSON or CSV
 - 🎲 Seeded deterministic generation for reproducible tests
 - 📝 TypeScript support with full IntelliSense
 - 🤖 AI/LLM integration via `schema.json` and `describe()` method
@@ -246,6 +250,22 @@ faker.detailedPerson("yoruba", "male")
   address: 'Plot 45, Oluwaseun Adedayo Street, Ibadan',
   state: 'Oyo',
   lga: 'Ibadan North',
+  dateOfBirth: { date: '1990-03-15', age: 35 },
+  maritalStatus: 'Married',
+  bloodGroup: 'O+',
+  genotype: 'AA',
+  salary: {
+    amount: 450000,
+    currency: 'NGN',
+    level: 'mid',
+    frequency: 'monthly'
+  },
+  nextOfKin: {
+    fullName: 'Folake Adeyemi',
+    relationship: 'Spouse',
+    phone: '+2348091234567',
+    address: '12, Akinola Crescent, Ibadan'
+  },
   education: {
     university: 'University of Ibadan',
     abbreviation: 'UI',
@@ -272,6 +292,48 @@ faker.detailedPerson("yoruba", "male")
 ```javascript
 // Generate multiple detailed people
 faker.detailedPeople(5, "igbo", "female")
+```
+
+## Personal Data
+
+```javascript
+faker.dateOfBirth() // → { date: '1990-03-15', age: 35 }
+faker.dateOfBirth({ minAge: 25, maxAge: 40 }) // custom range
+
+faker.maritalStatus() // → 'Married'
+faker.bloodGroup() // → 'O+'
+faker.genotype() // → 'AS'
+```
+
+## Salary
+
+```javascript
+faker.salary()
+// → { amount: 450000, currency: 'NGN', level: 'mid', frequency: 'monthly' }
+
+faker.salary({ level: 'executive' })
+// → { amount: 3500000, currency: 'NGN', level: 'executive', frequency: 'monthly' }
+```
+
+## Next of Kin
+
+```javascript
+faker.nextOfKin("yoruba", "male")
+// → { fullName: 'Adebayo Ogunlesi', relationship: 'Brother', phone: '+234...', address: '...' }
+```
+
+## Bulk Export
+
+```javascript
+// Export as JSON string
+faker.export("person", 5) // 5 persons as JSON
+
+// Export as CSV
+faker.export("person", 5, "csv")
+// → title,firstName,lastName,fullName,email,phone,address\n...
+
+// Export detailed persons (nested fields are flattened in CSV)
+faker.export("detailedPerson", 10, "csv")
 ```
 
 ## TypeScript Support
