@@ -67,6 +67,16 @@ faker.email() // temilade.abolade@ymail.com
 faker.states() // array of states in Nigeria (36 states + FCT)
 
 faker.lgas() // array of local government areas in Nigeria
+
+// returns a bank account details
+faker.bankAccount()
+// → { bankName: 'Zenith Bank', bankCode: '057', accountNumber: '1234567890' }
+
+// returns a BVN (11-digit Bank Verification Number)
+faker.bvn() // → '22312345678'
+
+// returns a NIN (11-digit National Identification Number)
+faker.nin() // → '98765432101'
 ```
 
 ```javascript
@@ -99,24 +109,24 @@ faker.people()
 
 // array of person objects
 [
-{
-  title: 'Engr.',
-  firstName: 'Akintunde',
-  lastName: 'Owoyele',
-  fullName: 'Akintunde Owoyele',
-  email: 'akintunde.owoyele@gmail.com',
-  phone: '+2349093636382',
-  address: '63, Ebubedike Uzoma Avenue, Awka'
-}
-{
-  title: 'Mr.',
-  firstName: 'Olayinka',
-  lastName: 'Adedayo',
-  fullName: 'Olayinka Adedayo',
-  email: 'olayinka.adedayo@hotmail.fr',
-  phone: '+2348189416772',
-  address: 'Km 9, Lanre Ayotunde Crescent, Ilorin'
-}
+  {
+    title: 'Engr.',
+    firstName: 'Akintunde',
+    lastName: 'Owoyele',
+    fullName: 'Akintunde Owoyele',
+    email: 'akintunde.owoyele@gmail.com',
+    phone: '+2349093636382',
+    address: '63, Ebubedike Uzoma Avenue, Awka'
+  }
+  {
+    title: 'Mr.',
+    firstName: 'Olayinka',
+    lastName: 'Adedayo',
+    fullName: 'Olayinka Adedayo',
+    email: 'olayinka.adedayo@hotmail.fr',
+    phone: '+2348189416772',
+    address: 'Km 9, Lanre Ayotunde Crescent, Ilorin'
+  }
 ]
 ```
 > The `people` method returns 10 persons by default. If you want more persons to be returned by the method, use the example below.
@@ -142,18 +152,8 @@ faker.phoneNumber("mtn")
 // returns an email address from the name supplied
 faker.email("Aboderin Joshua")
 
-// returns a bank account details
-faker.bankAccount()
-// → { bankName: 'Zenith Bank', bankCode: '057', accountNumber: '1234567890' }
-
 // returns a bank account for a specific bank
 faker.bankAccount("Access Bank")
-
-// returns a BVN (11-digit Bank Verification Number)
-faker.bvn() // → '22312345678'
-
-// returns a NIN (11-digit National Identification Number)
-faker.nin() // → '98765432101'
 ```
 
 ## Seeded Generation
