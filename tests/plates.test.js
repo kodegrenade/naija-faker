@@ -18,9 +18,8 @@ describe("provider - licensePlate()", function () {
     assert.ok(plate.startsWith("KAN-"), `Expected KAN prefix, got: ${plate}`)
   })
 
-  it("should return error for invalid state", function () {
-    const result = faker.licensePlate("Narnia")
-    assert.equal(result, 'Invalid state name.')
+  it("should throw for invalid state", function () {
+    assert.throws(() => faker.licensePlate("Narnia"), { name: 'NaijaFakerError', code: 'INVALID_STATE' })
   })
 
   it("should generate different plates on multiple calls", function () {

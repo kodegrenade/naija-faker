@@ -67,9 +67,8 @@ describe("provider - bankAccount()", function () {
     assert.equal(account.bankName, "Access Bank")
   })
 
-  it("should return error for invalid bank name", function () {
-    const result = faker.bankAccount("Fake Bank")
-    assert.equal(result, 'Invalid bank name.')
+  it("should throw for invalid bank name", function () {
+    assert.throws(() => faker.bankAccount("Fake Bank"), { name: 'NaijaFakerError', code: 'INVALID_BANK' })
   })
 })
 

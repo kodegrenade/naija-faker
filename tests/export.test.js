@@ -55,9 +55,7 @@ describe("provider - export()", function () {
     assert.ok(header.includes('vehicle.make'), `Header missing vehicle.make: ${header}`)
   })
 
-  it("should return error for invalid type", function () {
-    const result = faker.export("banana")
-    assert.equal(typeof result, 'string')
-    assert.ok(result.includes('Invalid type'))
+  it("should throw for invalid type", function () {
+    assert.throws(() => faker.export("banana"), { name: 'NaijaFakerError', code: 'INVALID_TYPE' })
   })
 })

@@ -76,12 +76,23 @@ const { bloodGroups, genotypes } = require('../Providers/medical')
  */
 const { salaryBands, levels } = require('../Providers/salary')
 
+/**
+ * Error handling
+ */
+const { NaijaFakerError } = require('../errors')
+
 class Factory {
   /**
    * Internal PRNG state
    * @private
    */
   static _prng = null
+
+  /**
+   * Custom provider registry
+   * @private
+   */
+  static _customProviders = {}
 
   /**
    * Set a seed for deterministic output.
@@ -119,10 +130,34 @@ class Factory {
    * @param {Object} options
    */
   static config(options) {
-    if (typeof options === 'object' && typeof options !== undefined) {
-      this.language = (options.language) ? options.language.trim() : options.language
-      this.gender = (options.gender) ? options.gender.trim() : options.gender
-      this.network = (options.network) ? options.network.trim() : options.network
+    if (!options || typeof options !== 'object') {
+      throw new NaijaFakerError('Config requires an options object.', 'INVALID_PARAM')
+    }
+
+    const validLanguages = ['yoruba', 'igbo', 'hausa']
+    const validGenders = ['male', 'female']
+    const validNetworks = ['mtn', 'glo', 'airtel', '9mobile']
+
+    if (options.language) {
+      const lang = options.language.trim().toLowerCase()
+      if (!validLanguages.includes(lang)) {
+        throw new NaijaFakerError('Invalid language. Use "yoruba", "igbo", or "hausa".', 'INVALID_LANGUAGE')
+      }
+      this.language = lang
+    }
+    if (options.gender) {
+      const gen = options.gender.trim().toLowerCase()
+      if (!validGenders.includes(gen)) {
+        throw new NaijaFakerError('Invalid gender. Use "male" or "female".', 'INVALID_GENDER')
+      }
+      this.gender = gen
+    }
+    if (options.network) {
+      const net = options.network.trim().toLowerCase()
+      if (!validNetworks.includes(net)) {
+        throw new NaijaFakerError('Invalid network. Use "mtn", "glo", "airtel", or "9mobile".', 'INVALID_NETWORK')
+      }
+      this.network = options.network.trim()
     }
   }
 
@@ -183,8 +218,7 @@ class Factory {
         break;
 
       default:
-        return "no name selected"
-        break;
+        throw new NaijaFakerError('Invalid language. Use "yoruba", "igbo", or "hausa".', 'INVALID_LANGUAGE')
     }
   }
 
@@ -295,8 +329,8 @@ class Factory {
    * @returns {string} phone number
    */
   static phoneNumber(network) {
-    if (network && typeof network !== 'string' && typeof network !== undefined) {
-      return 'String value expected for network.'
+    if (network && typeof network !== 'string') {
+      throw new NaijaFakerError('Network must be a string.', 'INVALID_PARAM')
     }
 
     let wordCase = (network)
@@ -306,7 +340,7 @@ class Factory {
     let index = networks.indexOf(wordCase)
 
     if (index < 0) {
-      return 'Invalid network type.'
+      throw new NaijaFakerError('Invalid network. Use "mtn", "glo", "airtel", or "9mobile".', 'INVALID_NETWORK')
     }
 
     let selected = networks[index]
@@ -372,7 +406,7 @@ class Factory {
     if (bankName) {
       bank = banks.find(b => b.name.toLowerCase() === bankName.toLowerCase())
       if (!bank) {
-        return 'Invalid bank name.'
+        throw new NaijaFakerError(`Invalid bank name: "${bankName}".`, 'INVALID_BANK')
       }
     } else {
       bank = banks[Math.floor(this._random() * banks.length)]
@@ -414,7 +448,7 @@ class Factory {
     // Get matching regions for this language
     const regions = languageToRegions[lang]
     if (!regions) {
-      return 'Invalid language. Use "yoruba", "igbo", or "hausa".'
+      throw new NaijaFakerError('Invalid language. Use "yoruba", "igbo", or "hausa".', 'INVALID_LANGUAGE')
     }
 
     const region = regions[Math.floor(this._random() * regions.length)]
@@ -481,7 +515,7 @@ class Factory {
     if (state) {
       selectedState = stateNames.find(s => s.toLowerCase() === state.toLowerCase())
       if (!selectedState) {
-        return 'Invalid state name.'
+        throw new NaijaFakerError(`Invalid state name: "${state}".`, 'INVALID_STATE')
       }
     } else {
       selectedState = stateNames[Math.floor(this._random() * stateNames.length)]
@@ -617,10 +651,6 @@ class Factory {
   static detailedPerson(language, gender) {
     const person = this.consistentPerson(language || null, gender || null)
 
-    if (typeof person === 'string') {
-      return person // error message from consistentPerson
-    }
-
     // Determine language for regional university matching
     const langOptions = ["yoruba", "hausa", "igbo"]
     const lang = (language)
@@ -736,7 +766,7 @@ class Factory {
 
     const band = salaryBands[level]
     if (!band) {
-      return 'Invalid level. Use "entry", "mid", "senior", or "executive".'
+      throw new NaijaFakerError('Invalid level. Use "entry", "mid", "senior", or "executive".', 'INVALID_LEVEL')
     }
 
     const amount = Math.floor(band.min + this._random() * (band.max - band.min))
@@ -800,7 +830,7 @@ class Factory {
     const generatorKey = type ? type.toLowerCase() : 'person'
     const generator = generators[generatorKey]
     if (!generator) {
-      return 'Invalid type. Use "person", "detailedPerson", or "consistentPerson".'
+      throw new NaijaFakerError('Invalid type. Use "person", "detailedPerson", or "consistentPerson".', 'INVALID_TYPE')
     }
 
     const data = generator()
@@ -845,6 +875,62 @@ class Factory {
   }
 
   /**
+   * Register a custom provider
+   * 
+   * @param {string} name - Provider name (e.g. 'religion')
+   * @param {function} handler - Generator function that returns a value
+   * @throws {NaijaFakerError} If name or handler is invalid
+   */
+  static registerProvider(name, handler) {
+    if (!name || typeof name !== 'string') {
+      throw new NaijaFakerError('Provider name must be a non-empty string.', 'INVALID_PARAM')
+    }
+    if (typeof handler !== 'function') {
+      throw new NaijaFakerError('Provider handler must be a function.', 'INVALID_PARAM')
+    }
+
+    const key = name.toLowerCase()
+
+    // Prevent overriding built-in methods
+    if (typeof this[key] === 'function' || typeof this[name] === 'function') {
+      throw new NaijaFakerError(`Cannot override built-in method: "${name}".`, 'INVALID_PARAM')
+    }
+
+    this._customProviders[key] = handler
+  }
+
+  /**
+   * Generate a value from a registered custom provider
+   * 
+   * @param {string} name - Provider name
+   * @returns {*} Generated value from the provider
+   * @throws {NaijaFakerError} If provider is not registered
+   */
+  static generate(name) {
+    if (!name || typeof name !== 'string') {
+      throw new NaijaFakerError('Provider name must be a non-empty string.', 'INVALID_PARAM')
+    }
+
+    const key = name.toLowerCase()
+    const handler = this._customProviders[key]
+
+    if (!handler) {
+      throw new NaijaFakerError(`Unknown provider: "${name}". Register it first with registerProvider().`, 'INVALID_PARAM')
+    }
+
+    return handler(this)
+  }
+
+  /**
+   * List all registered custom providers
+   * 
+   * @returns {string[]} Array of provider names
+   */
+  static listProviders() {
+    return Object.keys(this._customProviders)
+  }
+
+  /**
    * Get API schema for AI/LLM tool integration
    * Returns structured descriptions of all available methods for agent discovery.
    * 
@@ -865,3 +951,4 @@ class Factory {
 }
 
 module.exports = Factory
+module.exports.NaijaFakerError = NaijaFakerError

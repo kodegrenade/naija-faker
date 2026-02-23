@@ -336,6 +336,62 @@ faker.export("person", 5, "csv")
 faker.export("detailedPerson", 10, "csv")
 ```
 
+## Custom Providers
+
+Extend naija-faker with your own data generators:
+
+```javascript
+// Register a custom provider
+faker.registerProvider('religion', (f) => {
+  const religions = ['Christianity', 'Islam', 'Traditional']
+  return religions[Math.floor(f._random() * religions.length)]
+})
+
+faker.generate('religion') // → 'Islam'
+
+// Complex return types work too
+faker.registerProvider('vehicle_insurance', (f) => ({
+  provider: 'AXA Mansard',
+  policyNumber: `POL-${Math.floor(f._random() * 900000 + 100000)}`,
+  type: 'comprehensive',
+}))
+
+faker.generate('vehicle_insurance')
+// → { provider: 'AXA Mansard', policyNumber: 'POL-482917', type: 'comprehensive' }
+
+// List registered providers
+faker.listProviders() // → ['religion', 'vehicle_insurance']
+```
+
+> **Note:** Custom providers receive the faker instance as an argument — use `f._random()` instead of `Math.random()` for seeded deterministic output.
+
+## Error Handling
+
+All validation errors throw a `NaijaFakerError` with a machine-readable `code`:
+
+```javascript
+const { NaijaFakerError } = require('naija-faker')
+
+try {
+  faker.name("klingon")
+} catch (err) {
+  console.log(err.name)    // 'NaijaFakerError'
+  console.log(err.code)    // 'INVALID_LANGUAGE'
+  console.log(err.message) // 'Invalid language. Use "yoruba", "igbo", or "hausa".'
+}
+```
+
+| Error Code | Methods |
+|-----------|---------|
+| `INVALID_LANGUAGE` | `name()`, `config()`, `consistentPerson()`, `detailedPerson()` |
+| `INVALID_GENDER` | `config()` |
+| `INVALID_NETWORK` | `phoneNumber()`, `config()` |
+| `INVALID_STATE` | `licensePlate()` |
+| `INVALID_BANK` | `bankAccount()` |
+| `INVALID_LEVEL` | `salary()` |
+| `INVALID_TYPE` | `export()` |
+| `INVALID_PARAM` | `config()`, `phoneNumber()` |
+
 ## TypeScript Support
 
 Naija Faker ships with TypeScript declarations out of the box. You get full IntelliSense and type checking with no additional setup.

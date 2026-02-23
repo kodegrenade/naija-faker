@@ -1,4 +1,13 @@
 /**
+ * Custom error class for naija-faker
+ */
+declare class NaijaFakerError extends Error {
+  /** Machine-readable error code */
+  code: string;
+  constructor(message: string, code: string);
+}
+
+/**
  * Configuration options for naija-faker
  */
 interface FakerConfig {
@@ -334,7 +343,23 @@ interface NaijaFaker {
    * Get API schema for AI/LLM tool integration
    */
   describe(method?: string): MethodSchema[] | MethodSchema | null;
+
+  /**
+   * Register a custom provider
+   */
+  registerProvider(name: string, handler: (faker: NaijaFaker) => any): void;
+
+  /**
+   * Generate a value from a registered custom provider
+   */
+  generate(name: string): any;
+
+  /**
+   * List all registered custom provider names
+   */
+  listProviders(): string[];
 }
 
 declare const faker: NaijaFaker;
 export = faker;
+export { NaijaFakerError };

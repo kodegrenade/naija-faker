@@ -59,9 +59,8 @@ describe("provider - detailedPerson()", function () {
     }
   })
 
-  it("should return error for invalid language", function () {
-    const result = faker.detailedPerson("klingon")
-    assert.equal(typeof result, 'string')
+  it("should throw for invalid language", function () {
+    assert.throws(() => faker.detailedPerson("klingon"), { name: 'NaijaFakerError', code: 'INVALID_LANGUAGE' })
   })
 
   it("should include personal data with valid structure", function () {

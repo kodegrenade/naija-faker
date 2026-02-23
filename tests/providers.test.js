@@ -21,9 +21,8 @@ describe("provider - name()", function () {
     assert.ok(name.split(' ').length >= 2)
   })
 
-  it("should return fallback for invalid language", function () {
-    const name = faker.name("klingon")
-    assert.equal(name, "no name selected")
+  it("should throw for invalid language", function () {
+    assert.throws(() => faker.name("klingon"), { name: 'NaijaFakerError', code: 'INVALID_LANGUAGE' })
   })
 })
 
@@ -95,9 +94,8 @@ describe("provider - phoneNumber()", function () {
     assert.ok(phone.startsWith('+234'), `Phone "${phone}" should start with +234`)
   })
 
-  it("should return error for invalid network", function () {
-    const result = faker.phoneNumber("vodafone")
-    assert.equal(result, 'Invalid network type.')
+  it("should throw for invalid network", function () {
+    assert.throws(() => faker.phoneNumber("vodafone"), { name: 'NaijaFakerError', code: 'INVALID_NETWORK' })
   })
 })
 
@@ -165,8 +163,10 @@ describe("provider - lgas()", function () {
 
 describe("provider - config()", function () {
   afterEach(function () {
-    // Reset config
-    faker.config({})
+    // Reset config directly
+    faker.language = undefined
+    faker.gender = undefined
+    faker.network = undefined
   })
 
   it("should set language, gender, and network", function () {
@@ -178,10 +178,22 @@ describe("provider - config()", function () {
 
   it("should persist language choice for name generation", function () {
     faker.config({ language: "igbo" })
-    // Generate multiple names; they should all work
     for (let i = 0; i < 5; i++) {
       const name = faker.name()
-      assert.notEqual(name, "no name selected")
+      assert.equal(typeof name, 'string')
+      assert.ok(name.split(' ').length >= 2)
     }
+  })
+
+  it("should throw for invalid language in config", function () {
+    assert.throws(() => faker.config({ language: "klingon" }), { name: 'NaijaFakerError', code: 'INVALID_LANGUAGE' })
+  })
+
+  it("should throw for invalid gender in config", function () {
+    assert.throws(() => faker.config({ gender: "other" }), { name: 'NaijaFakerError', code: 'INVALID_GENDER' })
+  })
+
+  it("should throw for non-object config", function () {
+    assert.throws(() => faker.config("yoruba"), { name: 'NaijaFakerError', code: 'INVALID_PARAM' })
   })
 })

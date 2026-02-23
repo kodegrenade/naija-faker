@@ -63,10 +63,8 @@ describe("provider - consistentPerson()", function () {
     }
   })
 
-  it("should return error for invalid language", function () {
-    const result = faker.consistentPerson("klingon")
-    assert.equal(typeof result, 'string')
-    assert.ok(result.includes('Invalid language'))
+  it("should throw for invalid language", function () {
+    assert.throws(() => faker.consistentPerson("klingon"), { name: 'NaijaFakerError', code: 'INVALID_LANGUAGE' })
   })
 })
 

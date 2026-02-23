@@ -58,9 +58,7 @@ describe("provider - salary()", function () {
     }
   })
 
-  it("should return error for invalid level", function () {
-    const result = faker.salary({ level: "intern" })
-    assert.equal(typeof result, 'string')
-    assert.ok(result.includes('Invalid level'))
+  it("should throw for invalid level", function () {
+    assert.throws(() => faker.salary({ level: "intern" }), { name: 'NaijaFakerError', code: 'INVALID_LEVEL' })
   })
 })
