@@ -105,6 +105,9 @@ class Factory {
       this._prng = null
       return
     }
+    if (typeof value !== 'number' || isNaN(value)) {
+      throw new NaijaFakerError('Seed value must be a number.', 'INVALID_PARAM')
+    }
     let s = value | 0
     this._prng = function () {
       s |= 0; s = s + 0x6D2B79F5 | 0
@@ -248,7 +251,10 @@ class Factory {
    * @returns {array} people
    */
   static people(number) {
-    let count = (number) ? number : 10
+    let count = (number !== undefined && number !== null) ? number : 10
+    if (typeof count !== 'number' || count < 1 || !Number.isInteger(count)) {
+      throw new NaijaFakerError('Count must be a positive integer.', 'INVALID_PARAM')
+    }
     let list = []
     for (let index = 0; index < count; index++) {
       const data = this.person();
@@ -493,7 +499,10 @@ class Factory {
    * @returns {array} Array of consistent person objects
    */
   static consistentPeople(number, language, gender) {
-    let count = (number) ? number : 10
+    let count = (number !== undefined && number !== null) ? number : 10
+    if (typeof count !== 'number' || count < 1 || !Number.isInteger(count)) {
+      throw new NaijaFakerError('Count must be a positive integer.', 'INVALID_PARAM')
+    }
     let list = []
     for (let index = 0; index < count; index++) {
       const data = this.consistentPerson(language || null, gender || null)
@@ -689,7 +698,10 @@ class Factory {
    * @returns {array} Array of detailed person objects
    */
   static detailedPeople(number, language, gender) {
-    let count = (number) ? number : 10
+    let count = (number !== undefined && number !== null) ? number : 10
+    if (typeof count !== 'number' || count < 1 || !Number.isInteger(count)) {
+      throw new NaijaFakerError('Count must be a positive integer.', 'INVALID_PARAM')
+    }
     let list = []
     for (let index = 0; index < count; index++) {
       const data = this.detailedPerson(language || null, gender || null)
@@ -707,6 +719,17 @@ class Factory {
   static dateOfBirth(options) {
     const minAge = (options && options.minAge !== undefined) ? options.minAge : 18
     const maxAge = (options && options.maxAge !== undefined) ? options.maxAge : 65
+
+    if (typeof minAge !== 'number' || typeof maxAge !== 'number') {
+      throw new NaijaFakerError('minAge and maxAge must be numbers.', 'INVALID_PARAM')
+    }
+    if (minAge < 0 || maxAge < 0) {
+      throw new NaijaFakerError('minAge and maxAge must not be negative.', 'INVALID_PARAM')
+    }
+    if (minAge > maxAge) {
+      throw new NaijaFakerError('minAge must be less than or equal to maxAge.', 'INVALID_PARAM')
+    }
+
     const age = minAge + Math.floor(this._random() * (maxAge - minAge + 1))
 
     const now = new Date()
@@ -818,8 +841,14 @@ class Factory {
    * @returns {string} Formatted data string
    */
   static export(type, count, format) {
-    const num = count || 10
+    const num = (count !== undefined && count !== null) ? count : 10
+    if (typeof num !== 'number' || num < 1 || !Number.isInteger(num)) {
+      throw new NaijaFakerError('Count must be a positive integer.', 'INVALID_PARAM')
+    }
     const fmt = (format) ? format.toLowerCase() : 'json'
+    if (fmt !== 'json' && fmt !== 'csv') {
+      throw new NaijaFakerError('Invalid format. Use "json" or "csv".', 'INVALID_PARAM')
+    }
 
     const generators = {
       'person': () => this.people(num),
