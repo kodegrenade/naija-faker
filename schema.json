@@ -460,6 +460,212 @@
       }
     },
     {
+      "name": "licensePlate",
+      "description": "Generate a fake Nigerian license plate number in STATE-DIGITS+LETTERS format.",
+      "parameters": [
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "State name for plate prefix. Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "License plate e.g. 'LAG-234XY'"
+      },
+      "example": {
+        "call": "faker.licensePlate('Lagos')",
+        "result": "LAG-234XY"
+      }
+    },
+    {
+      "name": "company",
+      "description": "Generate a fake Nigerian company with name, RC number, and industry.",
+      "parameters": [],
+      "returns": {
+        "type": "object",
+        "description": "{ name, rcNumber, industry }"
+      },
+      "example": {
+        "call": "faker.company()",
+        "result": {
+          "name": "Pan-African Solutions Ltd",
+          "rcNumber": "RC-1234567",
+          "industry": "Technology"
+        }
+      }
+    },
+    {
+      "name": "university",
+      "description": "Generate a random Nigerian university with name, abbreviation, state, and type.",
+      "parameters": [],
+      "returns": {
+        "type": "object",
+        "description": "{ name, abbreviation, state, type }"
+      },
+      "example": {
+        "call": "faker.university()",
+        "result": {
+          "name": "University of Lagos",
+          "abbreviation": "UNILAG",
+          "state": "Lagos",
+          "type": "federal"
+        }
+      }
+    },
+    {
+      "name": "educationRecord",
+      "description": "Generate a fake education record with university, degree, course, and graduation year.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Filter universities by region matching this language."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "{ university, abbreviation, degree, course, graduationYear }"
+      },
+      "example": {
+        "call": "faker.educationRecord('yoruba')",
+        "result": {
+          "university": "University of Lagos",
+          "abbreviation": "UNILAG",
+          "degree": "B.Sc",
+          "course": "Computer Science",
+          "graduationYear": 2019
+        }
+      }
+    },
+    {
+      "name": "workRecord",
+      "description": "Generate a fake work/employment record with company, position, industry, and start year.",
+      "parameters": [],
+      "returns": {
+        "type": "object",
+        "description": "{ company, position, industry, startYear }"
+      },
+      "example": {
+        "call": "faker.workRecord()",
+        "result": {
+          "company": "Pan-African Solutions Ltd",
+          "position": "Senior Analyst",
+          "industry": "Technology",
+          "startYear": 2019
+        }
+      }
+    },
+    {
+      "name": "vehicleRecord",
+      "description": "Generate a fake vehicle ownership record with license plate, make, model, year, and color.",
+      "parameters": [
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "State for license plate prefix."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "{ licensePlate, make, model, year, color }"
+      },
+      "example": {
+        "call": "faker.vehicleRecord('Lagos')",
+        "result": {
+          "licensePlate": "LAG-234XY",
+          "make": "Toyota",
+          "model": "Corolla",
+          "year": 2021,
+          "color": "Silver"
+        }
+      }
+    },
+    {
+      "name": "detailedPerson",
+      "description": "Generate a detailed fake Nigerian person with geographic consistency plus education, work, and vehicle records.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Language/ethnicity."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "ConsistentPerson + education + work + vehicle records"
+      },
+      "example": {
+        "call": "faker.detailedPerson('yoruba', 'male')",
+        "result": "{ ...person, education: {...}, work: {...}, vehicle: {...} }"
+      }
+    },
+    {
+      "name": "detailedPeople",
+      "description": "Generate multiple detailed fake Nigerian persons.",
+      "parameters": [
+        {
+          "name": "number",
+          "type": "integer",
+          "required": false,
+          "description": "Count. Defaults to 10."
+        },
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Language/ethnicity."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender."
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "Array of DetailedPerson objects"
+      },
+      "example": {
+        "call": "faker.detailedPeople(5, 'igbo')",
+        "result": "[...5 detailed person objects]"
+      }
+    },
+    {
       "name": "describe",
       "description": "Get API schema for AI/LLM tool integration. Returns structured descriptions of all available methods.",
       "parameters": [

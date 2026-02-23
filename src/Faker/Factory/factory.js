@@ -41,6 +41,31 @@ const { banks } = require('../Providers/bank')
  */
 const { regionMap, stateLgas, languageToRegions } = require('../Providers/geo')
 
+/**
+ * Plates Provider
+ */
+const { stateCodes } = require('../Providers/plates')
+
+/**
+ * Company Provider
+ */
+const { companySuffixes, companyPrefixes, companyNouns, industries } = require('../Providers/company')
+
+/**
+ * University Provider
+ */
+const { universities } = require('../Providers/university')
+
+/**
+ * Vehicle Provider
+ */
+const { vehicleMakes, vehicleColors } = require('../Providers/vehicles')
+
+/**
+ * Jobs Provider
+ */
+const { positions, degrees, courses } = require('../Providers/jobs')
+
 class Factory {
   /**
    * Internal PRNG state
@@ -428,6 +453,196 @@ class Factory {
     let list = []
     for (let index = 0; index < count; index++) {
       const data = this.consistentPerson(language || null, gender || null)
+      list.push(data)
+    }
+    return list
+  }
+
+  /**
+   * Generates a fake Nigerian license plate number
+   * 
+   * @param {string} state - Optional state name to use for prefix
+   * @returns {string} License plate e.g. "LAG-234XY"
+   */
+  static licensePlate(state) {
+    const stateNames = Object.keys(stateCodes)
+    let selectedState
+
+    if (state) {
+      selectedState = stateNames.find(s => s.toLowerCase() === state.toLowerCase())
+      if (!selectedState) {
+        return 'Invalid state name.'
+      }
+    } else {
+      selectedState = stateNames[Math.floor(this._random() * stateNames.length)]
+    }
+
+    const code = stateCodes[selectedState]
+    const digits = String(Math.floor(100 + this._random() * 900))
+    const letters = 'ABCDEFGHJKLMNPRSTUVWXYZ'
+    const letter1 = letters[Math.floor(this._random() * letters.length)]
+    const letter2 = letters[Math.floor(this._random() * letters.length)]
+
+    return `${code}-${digits}${letter1}${letter2}`
+  }
+
+  /**
+   * Generates a fake Nigerian company
+   * 
+   * @returns {object} { name, rcNumber, industry }
+   */
+  static company() {
+    const prefix = companyPrefixes[Math.floor(this._random() * companyPrefixes.length)]
+    const noun = companyNouns[Math.floor(this._random() * companyNouns.length)]
+    const suffix = companySuffixes[Math.floor(this._random() * companySuffixes.length)]
+    const industry = industries[Math.floor(this._random() * industries.length)]
+    const rcNum = Math.floor(100000 + this._random() * 9900000)
+
+    return {
+      name: `${prefix} ${noun} ${suffix}`,
+      rcNumber: `RC-${rcNum}`,
+      industry: industry,
+    }
+  }
+
+  /**
+   * Generates a random Nigerian university
+   * 
+   * @returns {object} { name, abbreviation, state, type }
+   */
+  static university() {
+    const uni = universities[Math.floor(this._random() * universities.length)]
+    return { ...uni }
+  }
+
+  /**
+   * Generates a fake education record
+   * 
+   * @param {string} language - Optional language to filter universities by region
+   * @returns {object} { university, abbreviation, degree, course, graduationYear }
+   */
+  static educationRecord(language) {
+    let uni
+
+    if (language) {
+      const regions = languageToRegions[language.toLowerCase()]
+      if (regions) {
+        const regionStates = []
+        regions.forEach(r => regionStates.push(...regionMap[r].states))
+        const regionalUnis = universities.filter(u => regionStates.includes(u.state))
+        if (regionalUnis.length > 0) {
+          uni = regionalUnis[Math.floor(this._random() * regionalUnis.length)]
+        }
+      }
+    }
+
+    if (!uni) {
+      uni = universities[Math.floor(this._random() * universities.length)]
+    }
+
+    const degree = degrees[Math.floor(this._random() * degrees.length)]
+    const course = courses[Math.floor(this._random() * courses.length)]
+    const currentYear = new Date().getFullYear()
+    const graduationYear = currentYear - Math.floor(this._random() * 20) - 1
+
+    return {
+      university: uni.name,
+      abbreviation: uni.abbreviation,
+      degree: degree.code,
+      course: course,
+      graduationYear: graduationYear,
+    }
+  }
+
+  /**
+   * Generates a fake work/employment record
+   * 
+   * @returns {object} { company, position, industry, startYear }
+   */
+  static workRecord() {
+    const comp = this.company()
+    const position = positions[Math.floor(this._random() * positions.length)]
+    const currentYear = new Date().getFullYear()
+    const startYear = currentYear - Math.floor(this._random() * 15)
+
+    return {
+      company: comp.name,
+      position: position,
+      industry: comp.industry,
+      startYear: startYear,
+    }
+  }
+
+  /**
+   * Generates a fake vehicle record
+   * 
+   * @param {string} state - Optional state for license plate
+   * @returns {object} { licensePlate, make, model, year, color }
+   */
+  static vehicleRecord(state) {
+    const plate = this.licensePlate(state || null)
+    const makeData = vehicleMakes[Math.floor(this._random() * vehicleMakes.length)]
+    const model = makeData.models[Math.floor(this._random() * makeData.models.length)]
+    const color = vehicleColors[Math.floor(this._random() * vehicleColors.length)]
+    const currentYear = new Date().getFullYear()
+    const year = currentYear - Math.floor(this._random() * 15)
+
+    return {
+      licensePlate: plate,
+      make: makeData.make,
+      model: model,
+      year: year,
+      color: color,
+    }
+  }
+
+  /**
+   * Generates a detailed fake Nigerian person with education, work, and vehicle records.
+   * Uses consistentPerson() internally for geographic coherence.
+   * 
+   * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
+   * @param {string} gender - "male" or "female" (optional)
+   * @returns {object} Rich identity with person + education + work + vehicle
+   */
+  static detailedPerson(language, gender) {
+    const person = this.consistentPerson(language || null, gender || null)
+
+    if (typeof person === 'string') {
+      return person // error message from consistentPerson
+    }
+
+    // Determine language for regional university matching
+    const langOptions = ["yoruba", "hausa", "igbo"]
+    const lang = (language)
+      ? language.trim().toLowerCase()
+      : (this.language ? this.language
+        : langOptions[Math.floor(this._random() * langOptions.length)])
+
+    const education = this.educationRecord(lang)
+    const work = this.workRecord()
+    const vehicle = this.vehicleRecord(person.state)
+
+    return {
+      ...person,
+      education: education,
+      work: work,
+      vehicle: vehicle,
+    }
+  }
+
+  /**
+   * Generates multiple detailed fake Nigerian persons.
+   * 
+   * @param {number} number - Number of people (default: 10)
+   * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
+   * @param {string} gender - "male" or "female" (optional)
+   * @returns {array} Array of detailed person objects
+   */
+  static detailedPeople(number, language, gender) {
+    let count = (number) ? number : 10
+    let list = []
+    for (let index = 0; index < count; index++) {
+      const data = this.detailedPerson(language || null, gender || null)
       list.push(data)
     }
     return list

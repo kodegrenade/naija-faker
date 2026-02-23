@@ -41,6 +41,18 @@ interface ConsistentPerson extends Person {
 }
 
 /**
+ * A detailed person with education, work, and vehicle records
+ */
+interface DetailedPerson extends ConsistentPerson {
+  /** Education record */
+  education: EducationRecord;
+  /** Work/employment record */
+  work: WorkRecord;
+  /** Vehicle ownership record */
+  vehicle: VehicleRecord;
+}
+
+/**
  * A generated bank account object
  */
 interface BankAccount {
@@ -50,6 +62,78 @@ interface BankAccount {
   bankCode: string;
   /** 10-digit NUBAN account number */
   accountNumber: string;
+}
+
+/**
+ * A generated company object
+ */
+interface Company {
+  /** Company name (e.g., "Pan-African Solutions Ltd") */
+  name: string;
+  /** RC registration number */
+  rcNumber: string;
+  /** Industry sector */
+  industry: string;
+}
+
+/**
+ * A generated university object
+ */
+interface University {
+  /** Full university name */
+  name: string;
+  /** Common abbreviation (e.g., "UNILAG") */
+  abbreviation: string;
+  /** State where the university is located */
+  state: string;
+  /** Ownership type: "federal", "state", or "private" */
+  type: "federal" | "state" | "private";
+}
+
+/**
+ * A generated education record
+ */
+interface EducationRecord {
+  /** University name */
+  university: string;
+  /** University abbreviation */
+  abbreviation: string;
+  /** Degree code (e.g., "B.Sc", "M.Sc", "Ph.D") */
+  degree: string;
+  /** Course of study */
+  course: string;
+  /** Year of graduation */
+  graduationYear: number;
+}
+
+/**
+ * A generated work/employment record
+ */
+interface WorkRecord {
+  /** Company name */
+  company: string;
+  /** Job position/title */
+  position: string;
+  /** Industry sector */
+  industry: string;
+  /** Year employment started */
+  startYear: number;
+}
+
+/**
+ * A generated vehicle record
+ */
+interface VehicleRecord {
+  /** Nigerian license plate number */
+  licensePlate: string;
+  /** Vehicle make (e.g., "Toyota") */
+  make: string;
+  /** Vehicle model (e.g., "Corolla") */
+  model: string;
+  /** Year of manufacture */
+  year: number;
+  /** Vehicle color */
+  color: string;
 }
 
 /**
@@ -81,118 +165,126 @@ interface MethodSchema {
 interface NaijaFaker {
   /**
    * Set default configuration for data generation
-   * @param options - Configuration options
    */
   config(options: FakerConfig): void;
 
   /**
    * Set a seed for deterministic output. Call without arguments to reset.
-   * @param value - Seed number (omit to reset to non-deterministic)
    */
   seed(value?: number): void;
 
   /**
    * Generate a fake Nigerian name
-   * @param language - Nigerian language: "yoruba", "igbo", or "hausa"
-   * @param gender - "male" or "female"
-   * @returns Full name string (firstName + lastName)
    */
   name(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): string;
 
   /**
    * Generate a fake Nigerian person with complete identity data
-   * @param language - Nigerian language: "yoruba", "igbo", or "hausa"
-   * @param gender - "male" or "female"
-   * @returns Person object with name, email, phone, address, and title
    */
   person(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): Person;
 
   /**
    * Generate multiple fake Nigerian persons
-   * @param number - Number of people to generate (default: 10)
-   * @returns Array of Person objects
    */
   people(number?: number): Person[];
 
   /**
    * Generate a geographically consistent fake Nigerian person
-   * @param language - Nigerian language: "yoruba", "igbo", or "hausa"
-   * @param gender - "male" or "female"
-   * @returns ConsistentPerson with coherent state, LGA, and address
    */
   consistentPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): ConsistentPerson;
 
   /**
    * Generate multiple geographically consistent fake Nigerian persons
-   * @param number - Number of people (default: 10)
-   * @param language - Nigerian language: "yoruba", "igbo", or "hausa"
-   * @param gender - "male" or "female"
-   * @returns Array of ConsistentPerson objects
    */
   consistentPeople(number?: number, language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): ConsistentPerson[];
 
   /**
+   * Generate a detailed person with education, work, and vehicle records
+   */
+  detailedPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): DetailedPerson;
+
+  /**
+   * Generate multiple detailed persons
+   */
+  detailedPeople(number?: number, language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): DetailedPerson[];
+
+  /**
    * Generate a Nigerian title/honorific
-   * @param gender - "male" or "female"
-   * @returns Title string (e.g., "Mr.", "Chief", "Alhaji")
    */
   title(gender?: "male" | "female"): string;
 
   /**
    * Generate a fake email address
-   * @param name - Optional name to base the email on
-   * @returns Email address string
    */
   email(name?: string): string;
 
   /**
    * Generate a fake Nigerian street address
-   * @returns Address string
    */
   address(): string;
 
   /**
    * Generate a fake Nigerian phone number
-   * @param network - Mobile network: "mtn", "glo", "airtel", or "9mobile"
-   * @returns Phone number string in +234 format
    */
   phoneNumber(network?: "mtn" | "glo" | "airtel" | "9mobile"): string;
 
   /**
    * Generate a fake BVN (Bank Verification Number)
-   * @returns 11-digit BVN string
    */
   bvn(): string;
 
   /**
    * Generate a fake NIN (National Identification Number)
-   * @returns 11-digit NIN string
    */
   nin(): string;
 
   /**
    * Generate a fake Nigerian bank account
-   * @param bankName - Optional specific bank name
-   * @returns BankAccount object with bankName, bankCode, accountNumber
    */
   bankAccount(bankName?: string): BankAccount;
 
   /**
+   * Generate a fake Nigerian license plate number
+   */
+  licensePlate(state?: string): string;
+
+  /**
+   * Generate a fake Nigerian company
+   */
+  company(): Company;
+
+  /**
+   * Generate a random Nigerian university
+   */
+  university(): University;
+
+  /**
+   * Generate a fake education record
+   */
+  educationRecord(language?: "yoruba" | "igbo" | "hausa"): EducationRecord;
+
+  /**
+   * Generate a fake work/employment record
+   */
+  workRecord(): WorkRecord;
+
+  /**
+   * Generate a fake vehicle record
+   */
+  vehicleRecord(state?: string): VehicleRecord;
+
+  /**
    * Get all Nigerian states (36 states + FCT)
-   * @returns Array of state names
    */
   states(): string[];
 
   /**
    * Get all Nigerian Local Government Areas
-   * @returns Array of LGA names
    */
   lgas(): string[];
 
   /**
    * Get API schema for AI/LLM tool integration
-   * @param method - Optional specific method name to describe
-   * @returns Full API schema or schema for a specific method
    */
   describe(method?: string): MethodSchema[] | MethodSchema | null;
 }

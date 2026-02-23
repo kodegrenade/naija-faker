@@ -14,7 +14,9 @@ Naija Faker is a javascript library that generates fake typical Nigerian data ra
 - 🏘️ 774 Local Government Areas
 - 👑 Nigerian-specific titles (Chief, Alhaji, Oba, Emir, Igwe, and more)
 - 🏦 BVN, NIN, and bank account generation (26 Nigerian banks)
+- 🚗 License plates, companies, and 42 Nigerian universities
 - 🎯 Geographically consistent identities (name + state + LGA all match)
+- 💼 Detailed persons with education, work, and vehicle records
 - 🎲 Seeded deterministic generation for reproducible tests
 - 📝 TypeScript support with full IntelliSense
 - 🤖 AI/LLM integration via `schema.json` and `describe()` method
@@ -196,6 +198,80 @@ faker.consistentPerson("yoruba", "male")
 // Generate multiple consistent people
 faker.consistentPeople(5, "hausa", "female")
 // → 5 Hausa female persons, all with northern states and matching LGAs
+```
+
+## License Plates, Companies & Universities
+
+```javascript
+// Generate a Nigerian license plate
+faker.licensePlate() // → 'LAG-234XY'
+faker.licensePlate("Kano") // → 'KAN-891AB'
+
+// Generate a Nigerian company
+faker.company()
+// → { name: 'Pan-African Solutions Ltd', rcNumber: 'RC-1234567', industry: 'Technology' }
+
+// Generate a Nigerian university
+faker.university()
+// → { name: 'University of Lagos', abbreviation: 'UNILAG', state: 'Lagos', type: 'federal' }
+```
+
+## Records
+
+```javascript
+faker.educationRecord("yoruba")
+// → { university: 'University of Lagos', abbreviation: 'UNILAG', degree: 'B.Sc', course: 'Computer Science', graduationYear: 2019 }
+
+faker.workRecord()
+// → { company: 'Pan-African Solutions Ltd', position: 'Senior Analyst', industry: 'Technology', startYear: 2019 }
+
+faker.vehicleRecord("Lagos")
+// → { licensePlate: 'LAG-234XY', make: 'Toyota', model: 'Corolla', year: 2021, color: 'Silver' }
+```
+
+## Detailed Person
+
+Generate a rich identity with education, work, and vehicle records — all geographically coherent.
+
+```javascript
+faker.detailedPerson("yoruba", "male")
+
+{
+  title: 'Chief',
+  firstName: 'Adebayo',
+  lastName: 'Ogunlesi',
+  fullName: 'Adebayo Ogunlesi',
+  email: 'adebayo.ogunlesi@gmail.com',
+  phone: '+2348031234567',
+  address: 'Plot 45, Oluwaseun Adedayo Street, Ibadan',
+  state: 'Oyo',
+  lga: 'Ibadan North',
+  education: {
+    university: 'University of Ibadan',
+    abbreviation: 'UI',
+    degree: 'B.Sc',
+    course: 'Computer Science',
+    graduationYear: 2019
+  },
+  work: {
+    company: 'Pan-African Solutions Ltd',
+    position: 'Software Engineer',
+    industry: 'Technology',
+    startYear: 2020
+  },
+  vehicle: {
+    licensePlate: 'OYO-234XY',
+    make: 'Toyota',
+    model: 'Corolla',
+    year: 2021,
+    color: 'Silver'
+  }
+}
+```
+
+```javascript
+// Generate multiple detailed people
+faker.detailedPeople(5, "igbo", "female")
 ```
 
 ## TypeScript Support
