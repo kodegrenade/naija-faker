@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "naija-faker",
   "description": "Nigerian data faker library - generates fake Nigerian names, addresses, phone numbers, emails, and more. All data is culturally authentic, covering Yoruba, Igbo, and Hausa ethnic groups.",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "object",
   "methods": [
     {

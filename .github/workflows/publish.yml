@@ -1,6 +1,9 @@
 name: Publish to npm
 
 on:
+  push:
+    tags:
+      - 'v*'
   release:
     types: [created]
 
@@ -8,10 +11,16 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all tags
+        run: |
+          git fetch --tags
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,3 +38,19 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Get Changelog
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
+        id: get_changelog
+        run: |
+          previous_tag=$(git tag --sort=-creatordate | head -n 2 | tail -n 1)
+          echo "Previous tag: $previous_tag"
+          git log --pretty=format:"- %h %s" --abbrev-commit ${{ github.ref_name }}...$previous_tag > changelog.txt
+          cat changelog.txt
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
+        uses: ncipollo/release-action@v1
+        with:
+          name: "Grenadier Release ${{ github.ref_name }}"
+          bodyFile: changelog.txt
