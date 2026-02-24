@@ -1,37 +1,46 @@
 {
-	"name": "@codegrenade/naija-faker",
-	"version": "1.0.5",
-	"description": "Naija Faker is a javascript library that generates fake typical nigerian data for you",
-	"main": "index.js",
-	"scripts": {
-		"test": "mocha tests/index.test.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/kodegrenade/naija-faker.git"
-	},
-	"keywords": [
-		"javacript",
-		"github",
-		"open source",
-		"faker",
-		"nodejs",
-		"javascript faker",
-		"nigerian faker",
-		"nigerian data",
-		"fake data",
-		"faker generator"
-	],
-	"author": {
-		"name": "Temitope Ayotunde",
-		"email": "brhamix@gmail.com"
-	},
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/kodegrenade/naija-faker/issues"
-	},
-	"homepage": "https://github.com/kodegrenade/naija-faker#readme",
-	"dependencies": {
-		"mocha": "^9.1.2"
-	}
+  "name": "@codegrenade/naija-faker",
+  "version": "1.0.6",
+  "description": "Naija Faker is a javascript library that generates fake typical nigerian data for you",
+  "main": "index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "index.js",
+    "src/",
+    "types/",
+    "schema.json",
+    "LICENSE",
+    "readme.md"
+  ],
+  "scripts": {
+    "test": "mocha 'tests/**/*.test.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kodegrenade/naija-faker.git"
+  },
+  "keywords": [
+    "javacript",
+    "github",
+    "open source",
+    "faker",
+    "nodejs",
+    "javascript faker",
+    "nigerian faker",
+    "nigerian data",
+    "fake data",
+    "faker generator"
+  ],
+  "author": {
+    "name": "Temitope Ayotunde",
+    "email": "brhamix@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kodegrenade/naija-faker/issues"
+  },
+  "homepage": "https://github.com/kodegrenade/naija-faker#readme",
+  "devDependencies": {
+    "mocha": "^9.1.2"
+  }
 }

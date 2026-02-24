@@ -1,0 +1,857 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "naija-faker",
+  "description": "Nigerian data faker library - generates fake Nigerian names, addresses, phone numbers, emails, and more. All data is culturally authentic, covering Yoruba, Igbo, and Hausa ethnic groups.",
+  "version": "1.0.6",
+  "type": "object",
+  "methods": [
+    {
+      "name": "config",
+      "description": "Set default configuration for all subsequent data generation calls. Persists language, gender, and network preferences.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "object",
+          "required": true,
+          "description": "Configuration object",
+          "properties": {
+            "language": {
+              "type": "string",
+              "enum": [
+                "yoruba",
+                "igbo",
+                "hausa"
+              ],
+              "description": "Default Nigerian language/ethnicity for name generation"
+            },
+            "gender": {
+              "type": "string",
+              "enum": [
+                "male",
+                "female"
+              ],
+              "description": "Default gender for name and title generation"
+            },
+            "network": {
+              "type": "string",
+              "enum": [
+                "mtn",
+                "glo",
+                "airtel",
+                "9mobile"
+              ],
+              "description": "Default mobile network provider for phone numbers"
+            }
+          }
+        }
+      ],
+      "returns": {
+        "type": "void",
+        "description": "Sets internal defaults, no return value"
+      },
+      "example": {
+        "call": "faker.config({ language: 'yoruba', gender: 'male', network: 'mtn' })",
+        "result": null
+      }
+    },
+    {
+      "name": "name",
+      "description": "Generate a fake Nigerian full name (first name + last name) from the specified or random ethnic group.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Nigerian language/ethnicity. Random if not specified."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender for gendered first names. Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Full name string, e.g. 'Adebayo Ogunlesi'"
+      },
+      "example": {
+        "call": "faker.name('yoruba', 'male')",
+        "result": "Akintunde Owoyele"
+      }
+    },
+    {
+      "name": "person",
+      "description": "Generate a complete fake Nigerian person with title, name, email, phone, and address.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Nigerian language/ethnicity for the person's name"
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender for name and title"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Person object with keys: title, firstName, lastName, fullName, email, phone, address",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        }
+      },
+      "example": {
+        "call": "faker.person('hausa', 'female')",
+        "result": {
+          "title": "Alhaja",
+          "firstName": "Halima",
+          "lastName": "Ibrahim",
+          "fullName": "Halima Ibrahim",
+          "email": "halima.ibrahim@gmail.com",
+          "phone": "+2348031234567",
+          "address": "Plot 15, Usman Danladi Avenue, Kaduna"
+        }
+      }
+    },
+    {
+      "name": "people",
+      "description": "Generate an array of fake Nigerian persons. Each person has complete identity data.",
+      "parameters": [
+        {
+          "name": "number",
+          "type": "integer",
+          "required": false,
+          "description": "Number of people to generate. Defaults to 10."
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "Array of Person objects"
+      },
+      "example": {
+        "call": "faker.people(5)",
+        "result": "[...5 person objects]"
+      }
+    },
+    {
+      "name": "title",
+      "description": "Generate a Nigerian title/honorific. Includes culturally significant titles like Chief, Alhaji, Oba, Emir, Igwe.",
+      "parameters": [
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender-specific title. Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Title string, e.g. 'Chief', 'Alhaji', 'Dr.'"
+      },
+      "example": {
+        "call": "faker.title('male')",
+        "result": "Chief"
+      }
+    },
+    {
+      "name": "email",
+      "description": "Generate a fake email address, optionally based on a provided name.",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "description": "Name to base the email on. If not provided, a random name is used."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Email address string"
+      },
+      "example": {
+        "call": "faker.email('Ngozi Okonkwo')",
+        "result": "ngozi.okonkwo@gmail.com"
+      }
+    },
+    {
+      "name": "address",
+      "description": "Generate a fake Nigerian street address with number, name, type, and city.",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "Full address string"
+      },
+      "example": {
+        "call": "faker.address()",
+        "result": "45, Alhaji Kazeem Street, Kaduna"
+      }
+    },
+    {
+      "name": "phoneNumber",
+      "description": "Generate a fake Nigerian phone number in +234 international format.",
+      "parameters": [
+        {
+          "name": "network",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "mtn",
+            "glo",
+            "airtel",
+            "9mobile"
+          ],
+          "description": "Mobile network provider. Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Phone number in +234 format"
+      },
+      "example": {
+        "call": "faker.phoneNumber('mtn')",
+        "result": "+2348031234567"
+      }
+    },
+    {
+      "name": "states",
+      "description": "Get all 37 Nigerian states (36 states + Federal Capital Territory).",
+      "parameters": [],
+      "returns": {
+        "type": "array",
+        "description": "Array of 37 state name strings"
+      },
+      "example": {
+        "call": "faker.states()",
+        "result": [
+          "Abia",
+          "Adamawa",
+          "..."
+        ]
+      }
+    },
+    {
+      "name": "lgas",
+      "description": "Get all 774 Nigerian Local Government Areas (LGAs).",
+      "parameters": [],
+      "returns": {
+        "type": "array",
+        "description": "Array of LGA name strings"
+      },
+      "example": {
+        "call": "faker.lgas()",
+        "result": [
+          "Aba North",
+          "Aba South",
+          "..."
+        ]
+      }
+    },
+    {
+      "name": "seed",
+      "description": "Set a seed for deterministic output. All subsequent calls will produce identical results for the same seed. Call without arguments to reset to non-deterministic mode.",
+      "parameters": [
+        {
+          "name": "value",
+          "type": "integer",
+          "required": false,
+          "description": "Seed number. Omit to reset to random."
+        }
+      ],
+      "returns": {
+        "type": "void",
+        "description": "Sets internal PRNG state"
+      },
+      "example": {
+        "call": "faker.seed(12345)",
+        "result": null
+      }
+    },
+    {
+      "name": "bvn",
+      "description": "Generate a fake 11-digit Bank Verification Number (BVN).",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "11-digit BVN string"
+      },
+      "example": {
+        "call": "faker.bvn()",
+        "result": "22312345678"
+      }
+    },
+    {
+      "name": "nin",
+      "description": "Generate a fake 11-digit National Identification Number (NIN).",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "11-digit NIN string"
+      },
+      "example": {
+        "call": "faker.nin()",
+        "result": "98765432101"
+      }
+    },
+    {
+      "name": "bankAccount",
+      "description": "Generate a fake Nigerian bank account with bank name, CBN code, and 10-digit NUBAN account number.",
+      "parameters": [
+        {
+          "name": "bankName",
+          "type": "string",
+          "required": false,
+          "description": "Specific bank name (e.g., 'Zenith Bank'). Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Bank account object with bankName, bankCode, accountNumber",
+        "properties": {
+          "bankName": {
+            "type": "string"
+          },
+          "bankCode": {
+            "type": "string"
+          },
+          "accountNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "example": {
+        "call": "faker.bankAccount('Zenith Bank')",
+        "result": {
+          "bankName": "Zenith Bank",
+          "bankCode": "057",
+          "accountNumber": "1234567890"
+        }
+      }
+    },
+    {
+      "name": "consistentPerson",
+      "description": "Generate a geographically consistent fake Nigerian person. Name ethnicity, title, address, state, and LGA are all coherent.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Nigerian language/ethnicity. Random if not specified."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender for name and title."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "ConsistentPerson with title, name, email, phone, address, state, lga — all geographically coherent"
+      },
+      "example": {
+        "call": "faker.consistentPerson('yoruba', 'male')",
+        "result": {
+          "title": "Chief",
+          "firstName": "Adebayo",
+          "lastName": "Ogunlesi",
+          "fullName": "Adebayo Ogunlesi",
+          "email": "adebayo.ogunlesi@gmail.com",
+          "phone": "+2348031234567",
+          "address": "Plot 45, Oluwaseun Adedayo Street, Ibadan",
+          "state": "Oyo",
+          "lga": "Ibadan North"
+        }
+      }
+    },
+    {
+      "name": "consistentPeople",
+      "description": "Generate multiple geographically consistent fake Nigerian persons.",
+      "parameters": [
+        {
+          "name": "number",
+          "type": "integer",
+          "required": false,
+          "description": "Number of people to generate. Defaults to 10."
+        },
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Nigerian language/ethnicity for all people."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender for all people."
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "Array of ConsistentPerson objects"
+      },
+      "example": {
+        "call": "faker.consistentPeople(5, 'hausa', 'male')",
+        "result": "[...5 consistent person objects]"
+      }
+    },
+    {
+      "name": "licensePlate",
+      "description": "Generate a fake Nigerian license plate number in STATE-DIGITS+LETTERS format.",
+      "parameters": [
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "State name for plate prefix. Random if not specified."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "License plate e.g. 'LAG-234XY'"
+      },
+      "example": {
+        "call": "faker.licensePlate('Lagos')",
+        "result": "LAG-234XY"
+      }
+    },
+    {
+      "name": "company",
+      "description": "Generate a fake Nigerian company with name, RC number, and industry.",
+      "parameters": [],
+      "returns": {
+        "type": "object",
+        "description": "{ name, rcNumber, industry }"
+      },
+      "example": {
+        "call": "faker.company()",
+        "result": {
+          "name": "Pan-African Solutions Ltd",
+          "rcNumber": "RC-1234567",
+          "industry": "Technology"
+        }
+      }
+    },
+    {
+      "name": "university",
+      "description": "Generate a random Nigerian university with name, abbreviation, state, and type.",
+      "parameters": [],
+      "returns": {
+        "type": "object",
+        "description": "{ name, abbreviation, state, type }"
+      },
+      "example": {
+        "call": "faker.university()",
+        "result": {
+          "name": "University of Lagos",
+          "abbreviation": "UNILAG",
+          "state": "Lagos",
+          "type": "federal"
+        }
+      }
+    },
+    {
+      "name": "educationRecord",
+      "description": "Generate a fake education record with university, degree, course, and graduation year.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Filter universities by region matching this language."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "{ university, abbreviation, degree, course, graduationYear }"
+      },
+      "example": {
+        "call": "faker.educationRecord('yoruba')",
+        "result": {
+          "university": "University of Lagos",
+          "abbreviation": "UNILAG",
+          "degree": "B.Sc",
+          "course": "Computer Science",
+          "graduationYear": 2019
+        }
+      }
+    },
+    {
+      "name": "workRecord",
+      "description": "Generate a fake work/employment record with company, position, industry, and start year.",
+      "parameters": [],
+      "returns": {
+        "type": "object",
+        "description": "{ company, position, industry, startYear }"
+      },
+      "example": {
+        "call": "faker.workRecord()",
+        "result": {
+          "company": "Pan-African Solutions Ltd",
+          "position": "Senior Analyst",
+          "industry": "Technology",
+          "startYear": 2019
+        }
+      }
+    },
+    {
+      "name": "vehicleRecord",
+      "description": "Generate a fake vehicle ownership record with license plate, make, model, year, and color.",
+      "parameters": [
+        {
+          "name": "state",
+          "type": "string",
+          "required": false,
+          "description": "State for license plate prefix."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "{ licensePlate, make, model, year, color }"
+      },
+      "example": {
+        "call": "faker.vehicleRecord('Lagos')",
+        "result": {
+          "licensePlate": "LAG-234XY",
+          "make": "Toyota",
+          "model": "Corolla",
+          "year": 2021,
+          "color": "Silver"
+        }
+      }
+    },
+    {
+      "name": "detailedPerson",
+      "description": "Generate a detailed fake Nigerian person with geographic consistency plus education, work, and vehicle records.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Language/ethnicity."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "ConsistentPerson + education + work + vehicle records"
+      },
+      "example": {
+        "call": "faker.detailedPerson('yoruba', 'male')",
+        "result": "{ ...person, education: {...}, work: {...}, vehicle: {...} }"
+      }
+    },
+    {
+      "name": "detailedPeople",
+      "description": "Generate multiple detailed fake Nigerian persons.",
+      "parameters": [
+        {
+          "name": "number",
+          "type": "integer",
+          "required": false,
+          "description": "Count. Defaults to 10."
+        },
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Language/ethnicity."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender."
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "Array of DetailedPerson objects"
+      },
+      "example": {
+        "call": "faker.detailedPeople(5, 'igbo')",
+        "result": "[...5 detailed person objects]"
+      }
+    },
+    {
+      "name": "dateOfBirth",
+      "description": "Generate a fake date of birth with age, configurable via minAge and maxAge.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "object",
+          "required": false,
+          "description": "{ minAge?: number, maxAge?: number }. Defaults to 18–65."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "{ date: 'YYYY-MM-DD', age: number }"
+      },
+      "example": {
+        "call": "faker.dateOfBirth({ minAge: 25, maxAge: 40 })",
+        "result": {
+          "date": "1990-03-15",
+          "age": 35
+        }
+      }
+    },
+    {
+      "name": "maritalStatus",
+      "description": "Generate a random marital status.",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "Single, Married, Divorced, Widowed, or Separated"
+      },
+      "example": {
+        "call": "faker.maritalStatus()",
+        "result": "Married"
+      }
+    },
+    {
+      "name": "bloodGroup",
+      "description": "Generate a random blood group.",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "Blood group e.g. O+, A-, AB+"
+      },
+      "example": {
+        "call": "faker.bloodGroup()",
+        "result": "O+"
+      }
+    },
+    {
+      "name": "genotype",
+      "description": "Generate a random genotype (AA, AS, AC, SS, SC).",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "Genotype e.g. AA, AS, SS"
+      },
+      "example": {
+        "call": "faker.genotype()",
+        "result": "AS"
+      }
+    },
+    {
+      "name": "salary",
+      "description": "Generate a fake salary in NGN with level-based income bands.",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "object",
+          "required": false,
+          "description": "{ level?: 'entry'|'mid'|'senior'|'executive' }"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "{ amount, currency: 'NGN', level, frequency: 'monthly' }"
+      },
+      "example": {
+        "call": "faker.salary({ level: 'senior' })",
+        "result": {
+          "amount": 850000,
+          "currency": "NGN",
+          "level": "senior",
+          "frequency": "monthly"
+        }
+      }
+    },
+    {
+      "name": "nextOfKin",
+      "description": "Generate a fake next of kin with name, relationship, phone, and address.",
+      "parameters": [
+        {
+          "name": "language",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "yoruba",
+            "igbo",
+            "hausa"
+          ],
+          "description": "Language/ethnicity."
+        },
+        {
+          "name": "gender",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "male",
+            "female"
+          ],
+          "description": "Gender of the kin."
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "{ fullName, relationship, phone, address }"
+      },
+      "example": {
+        "call": "faker.nextOfKin('yoruba', 'male')",
+        "result": {
+          "fullName": "Adebayo Ogunlesi",
+          "relationship": "Brother",
+          "phone": "+2348031234567",
+          "address": "45, Kazeem Street, Lagos"
+        }
+      }
+    },
+    {
+      "name": "export",
+      "description": "Export generated data as JSON or CSV string. Supports person, detailedPerson, and consistentPerson types.",
+      "parameters": [
+        {
+          "name": "type",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "person",
+            "detailedPerson",
+            "consistentPerson"
+          ],
+          "description": "Type of person to generate. Default: person."
+        },
+        {
+          "name": "count",
+          "type": "integer",
+          "required": false,
+          "description": "Number of records. Default: 10."
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "required": false,
+          "enum": [
+            "json",
+            "csv"
+          ],
+          "description": "Output format. Default: json."
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "JSON or CSV formatted string"
+      },
+      "example": {
+        "call": "faker.export('person', 5, 'csv')",
+        "result": "title,firstName,lastName,..."
+      }
+    },
+    {
+      "name": "describe",
+      "description": "Get API schema for AI/LLM tool integration. Returns structured descriptions of all available methods.",
+      "parameters": [
+        {
+          "name": "method",
+          "type": "string",
+          "required": false,
+          "description": "Specific method name to describe. Returns all methods if not specified."
+        }
+      ],
+      "returns": {
+        "type": "array|object|null",
+        "description": "Array of method schemas, a single method schema, or null if method not found"
+      },
+      "example": {
+        "call": "faker.describe('name')",
+        "result": "{ method: 'name', description: '...', parameters: [...], returns: {...} }"
+      }
+    }
+  ]
+}

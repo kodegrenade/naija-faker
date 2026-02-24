@@ -1,0 +1,45 @@
+/**
+ * Nigerian License Plate Data
+ * Format: {STATE_CODE}-{3 DIGITS}{2 LETTERS}
+ */
+const stateCodes = {
+  "Abia": "ABI",
+  "Adamawa": "ADM",
+  "Akwa Ibom": "AKI",
+  "Anambra": "ANB",
+  "Bauchi": "BAU",
+  "Bayelsa": "BAY",
+  "Benue": "BEN",
+  "Borno": "BRN",
+  "Cross River": "CRS",
+  "Delta": "DLT",
+  "Ebonyi": "EBN",
+  "Edo": "EDO",
+  "Ekiti": "EKT",
+  "Enugu": "ENG",
+  "Federal Capital Territory": "ABJ",
+  "Gombe": "GMB",
+  "Imo": "IMO",
+  "Jigawa": "JIG",
+  "Kaduna": "KAD",
+  "Kano": "KAN",
+  "Katsina": "KAT",
+  "Kebbi": "KEB",
+  "Kogi": "KOG",
+  "Kwara": "KWR",
+  "Lagos": "LAG",
+  "Nasarawa": "NAS",
+  "Niger": "NIG",
+  "Ogun": "OGN",
+  "Ondo": "OND",
+  "Osun": "OSN",
+  "Oyo": "OYO",
+  "Plateau": "PLT",
+  "Rivers": "RIV",
+  "Sokoto": "SOK",
+  "Taraba": "TAR",
+  "Yobe": "YOB",
+  "Zamfara": "ZAM",
+}
+
+module.exports = { stateCodes }
