@@ -7,23 +7,23 @@
 Naija Faker is a javascript library that generates fake typical Nigerian data ranging from `name`, `address`, `phone number`, `lgas` and `states` for you. It supports **Yoruba**, **Igbo**, and **Hausa** ethnic groups with culturally authentic data.
 
 ## Features
-- 🇳🇬 Authentic Nigerian names (Yoruba, Igbo, Hausa)
-- 📱 Phone numbers for all 4 major networks (MTN, Glo, Airtel, 9mobile)
-- 📍 Addresses across all Nigerian regions
-- 🏛️ All 37 states (36 states + FCT)
-- 🏘️ 774 Local Government Areas
-- 👑 Nigerian-specific titles (Chief, Alhaji, Oba, Emir, Igwe, and more)
-- 🏦 BVN, NIN, and bank account generation (26 Nigerian banks)
-- 🚗 License plates, companies, and 42 Nigerian universities
-- 🎯 Geographically consistent identities (name + state + LGA all match)
-- 💼 Detailed persons with education, work, and vehicle records
-- 🩸 Date of birth, blood group, genotype, marital status
-- 💰 Salary generation with level-based income bands
-- 👨‍👩‍👧 Next of kin generation
-- 📦 Bulk export to JSON or CSV
-- 🎲 Seeded deterministic generation for reproducible tests
-- 📝 TypeScript support with full IntelliSense
-- 🤖 AI/LLM integration via `schema.json` and `describe()` method
+- Authentic Nigerian names (Yoruba, Igbo, Hausa)
+- Phone numbers for all 4 major networks (MTN, Glo, Airtel, 9mobile)
+- Addresses across all Nigerian regions
+- All 37 states (36 states + FCT)
+- 774 Local Government Areas
+- Nigerian-specific titles (Chief, Alhaji, Oba, Emir, Igwe, and more)
+- BVN, NIN, and bank account generation (26 Nigerian banks)
+- License plates, companies, and 42 Nigerian universities
+- Geographically consistent identities (name + state + LGA all match)
+- Detailed persons with education, work, and vehicle records
+- Date of birth, blood group, genotype, marital status
+- Salary generation with level-based income bands
+- Next of kin generation
+- Bulk export to JSON or CSV
+- Seeded deterministic generation for reproducible tests
+- TypeScript support with full IntelliSense
+- AI/LLM integration via `schema.json` and `describe()` method
 
 ## Installation
 Install the package in your existing project
