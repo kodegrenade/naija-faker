@@ -370,14 +370,15 @@ faker.listProviders() // → ['religion', 'vehicle_insurance']
 All validation errors throw a `NaijaFakerError` with a machine-readable `code`:
 
 ```javascript
-const { NaijaFakerError } = require('naija-faker')
+const faker = require('@codegrenade/naija-faker')
+
+// Access via property
+const { NaijaFakerError } = faker
 
 try {
   faker.name("klingon")
 } catch (err) {
-  console.log(err.name)    // 'NaijaFakerError'
-  console.log(err.code)    // 'INVALID_LANGUAGE'
-  console.log(err.message) // 'Invalid language. Use "yoruba", "igbo", or "hausa".'
+  if (err instanceof faker.NaijaFakerError) { ... }
 }
 ```
 

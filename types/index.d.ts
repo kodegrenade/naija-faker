@@ -359,7 +359,8 @@ interface NaijaFaker {
    */
   listProviders(): string[];
 }
-
-declare const faker: NaijaFaker;
 export = faker;
-export { NaijaFakerError };
+
+declare const faker: NaijaFaker & {
+  NaijaFakerError: typeof NaijaFakerError;
+};
