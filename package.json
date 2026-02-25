@@ -41,6 +41,6 @@
   },
   "homepage": "https://github.com/kodegrenade/naija-faker#readme",
   "devDependencies": {
-    "mocha": "^9.1.2"
+    "mocha": "^11.3.0"
   }
 }
