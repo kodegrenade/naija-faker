@@ -429,6 +429,9 @@ A `schema.json` file is included in the package, providing a full JSON Schema de
 const schema = require('@codegrenade/naija-faker/schema.json')
 ```
 
+## Disclaimer :warning:
+See [`DISCLAIMER`](DISCLAIMER) for details.
+
 ## Contributing
 Please feel free to fork the package and contribute by submitting a pull request to enhance the functionlities.
 
