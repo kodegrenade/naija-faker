@@ -430,7 +430,7 @@ const schema = require('@codegrenade/naija-faker/schema.json')
 ```
 
 ## Disclaimer :warning:
-See [`DISCLAIMER`](DISCLAIMER) for details.
+See [`DISCLAIMER`](DISCLAIMER.md) for details.
 
 ## Contributing
 Please feel free to fork the package and contribute by submitting a pull request to enhance the functionlities.
