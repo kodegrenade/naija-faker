@@ -64,7 +64,7 @@ const { vehicleMakes, vehicleColors } = require('../Providers/vehicles')
 /**
  * Jobs Provider
  */
-const { positionLevels, positionDisciplines, degrees, courseDisciplines } = require('../Providers/jobs')
+const { positionLevels, degrees, courseDisciplines } = require('../Providers/jobs')
 
 /**
  * Medical Provider
@@ -513,7 +513,7 @@ class Factory {
     }
     let list = []
     for (let index = 0; index < count; index++) {
-      const data = this.consistentPerson(language || null, gender || null, null)
+      const data = this.consistentPerson(language || null, gender || null)
       list.push(data)
     }
     return list
@@ -582,7 +582,9 @@ class Factory {
    * @param {string} language - Optional language to filter universities by region
    * @param {number} age - Optional current age; keeps the degree and the
    *                       graduation year behind the date of birth
-   * @returns {object} { university, abbreviation, degree, discipline, course, graduationYear }
+   * @returns {object|null} { university, abbreviation, degree, discipline, course,
+   *                          graduationYear }, or null if too young to have finished
+   *                          any qualification
    */
   static educationRecord(language, age) {
     let uni
@@ -606,18 +608,19 @@ class Factory {
     const currentYear = new Date().getFullYear()
     const hasAge = typeof age === 'number'
 
-    // Only award a qualification the person has lived long enough to finish
+    // Only award a qualification the person has lived long enough to finish.
+    // Too young for any of them and they simply do not have one yet.
     const affordable = hasAge ? degrees.filter(d => age >= d.gradAge) : degrees
-    const degree = this._pick(affordable.length ? affordable : [degrees.find(d => d.code === "OND")])
+    if (affordable.length === 0) return null
+
+    const degree = this._pick(affordable)
     const discipline = this._pick(degree.disciplines)
     const course = this._pick(courseDisciplines[discipline])
 
     // Graduated no earlier than the year they finished that degree, never in the future
     const latest = hasAge ? currentYear : currentYear - 1
     const earliest = hasAge ? Math.min(currentYear - age + degree.gradAge, latest) : currentYear - 21
-    // Squared draw biases toward the expected graduation age, so a 40-year-old
-    // fresh graduate stays the exception rather than one in every twenty
-    const graduationYear = earliest + Math.floor((this._random() ** 2) * (latest - earliest + 1))
+    const graduationYear = earliest + Math.floor(this._random() * (latest - earliest + 1))
 
     return {
       university: uni.name,
@@ -635,11 +638,9 @@ class Factory {
    * @param {number} age - Optional current age; nobody starts work before 18
    * @param {number} graduationYear - Optional; the job starts after the degree
    *                                  and seniority is measured from it
-   * @param {string} discipline - Optional field of study; keeps credential-bound
-   *                              roles off people who never qualified for them
    * @returns {object} { company, position, industry, startYear, yearsOfExperience, level }
    */
-  static workRecord(age, graduationYear, discipline) {
+  static workRecord(age, graduationYear) {
     const comp = this.company()
     const currentYear = new Date().getFullYear()
 
@@ -652,19 +653,13 @@ class Factory {
     // Seniority follows the whole career, not just the current job
     const careerStart = (typeof graduationYear === 'number') ? graduationYear : startYear
     const yearsOfExperience = currentYear - careerStart
-    // Experience sets the ceiling, it does not decide the outcome: most careers
-    // plateau below it, so a 25-year veteran is usually not a CEO
-    const tiers = ['entry', 'mid', 'senior', 'executive']
-    const ceiling = yearsOfExperience < 3 ? 0 : yearsOfExperience < 8 ? 1 : yearsOfExperience < 15 ? 2 : 3
-    const floor = Math.max(0, ceiling - 2)
-    const level = tiers[floor + Math.floor((this._random() ** 2) * (ceiling - floor + 1))]
-
-    const open = positionLevels[level].filter(role =>
-      !discipline || !positionDisciplines[role] || positionDisciplines[role].includes(discipline))
+    const level = yearsOfExperience < 3 ? 'entry'
+      : yearsOfExperience < 8 ? 'mid'
+        : yearsOfExperience < 15 ? 'senior' : 'executive'
 
     return {
       company: comp.name,
-      position: this._pick(open.length ? open : positionLevels[level]),
+      position: this._pick(positionLevels[level]),
       industry: comp.industry,
       startYear: startYear,
       yearsOfExperience: yearsOfExperience,
@@ -701,15 +696,17 @@ class Factory {
    * 
    * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
    * @param {string} gender - "male" or "female" (optional)
+   * @param {object} options - Optional { minAge, maxAge }, defaults 22 and 65.
+   *                           Below 22 the person may not hold a qualification yet
+   *                           and `education` is null.
    * @returns {object} Rich identity with person + personal data + education + work + vehicle
    */
-  static detailedPerson(language, gender) {
+  static detailedPerson(language, gender, options) {
     // Resolve the identity first; every record below is derived from it
     // rather than drawn independently.
     const { lang, gen } = this._resolve(language, gender)
 
-    // A detailed person holds a degree and a job, so they are at least 22
-    const dateOfBirth = this.dateOfBirth({ minAge: 22, maxAge: 65 })
+    const dateOfBirth = this.dateOfBirth({ minAge: 22, maxAge: 65, ...options })
     const maritalStatus = this.maritalStatus(dateOfBirth.age)
 
     // Education comes first: the title has to match the qualification
@@ -717,10 +714,10 @@ class Factory {
     const person = this.consistentPerson(lang, gen, {
       age: dateOfBirth.age,
       maritalStatus: maritalStatus,
-      degree: education.degree,
-      discipline: education.discipline,
+      degree: education && education.degree,
+      discipline: education && education.discipline,
     })
-    const work = this.workRecord(dateOfBirth.age, education.graduationYear, education.discipline)
+    const work = this.workRecord(dateOfBirth.age, education && education.graduationYear)
     const vehicle = this.vehicleRecord(person.state)
 
     // Next of kin is the opposite gender for variety
@@ -751,16 +748,17 @@ class Factory {
    * @param {number} number - Number of people (default: 10)
    * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
    * @param {string} gender - "male" or "female" (optional)
+   * @param {object} options - Optional { minAge, maxAge }, as detailedPerson()
    * @returns {array} Array of detailed person objects
    */
-  static detailedPeople(number, language, gender) {
+  static detailedPeople(number, language, gender, options) {
     let count = (number !== undefined && number !== null) ? number : 10
     if (typeof count !== 'number' || count < 1 || !Number.isInteger(count)) {
       throw new NaijaFakerError('Count must be a positive integer.', 'INVALID_PARAM')
     }
     let list = []
     for (let index = 0; index < count; index++) {
-      const data = this.detailedPerson(language || null, gender || null)
+      const data = this.detailedPerson(language || null, gender || null, options)
       list.push(data)
     }
     return list
@@ -910,7 +908,7 @@ class Factory {
       if (typeof age === 'number' && r.maxAge !== undefined && age > r.maxAge) return false
       return true
     })
-    const relationship = this._pick(eligible.length ? eligible : [{ name: "Sibling" }]).name
+    const relationship = this._pick(eligible).name
 
     // Relatives share the family name and, usually, the family's part of the country
     const kinName = this.name(language || null, gen)

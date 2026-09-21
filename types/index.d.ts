@@ -54,6 +54,16 @@ interface ConsistentPerson extends Person {
 }
 
 /**
+ * Age bounds, as accepted by dateOfBirth() and detailedPerson()
+ */
+interface AgeRange {
+  /** Youngest age to generate (default 18, or 22 for detailedPerson) */
+  minAge?: number;
+  /** Oldest age to generate (default 65) */
+  maxAge?: number;
+}
+
+/**
  * Identity context used to keep a generated title plausible
  */
 interface TitleContext {
@@ -99,8 +109,8 @@ interface DetailedPerson extends ConsistentPerson {
   salary: { amount: number; currency: string; level: string; frequency: string };
   /** Next of kin information */
   nextOfKin: { fullName: string; relationship: string; phone: string; address: string };
-  /** Education record */
-  education: EducationRecord;
+  /** Education record, or null if too young to have finished a qualification */
+  education: EducationRecord | null;
   /** Work/employment record */
   work: WorkRecord;
   /** Vehicle ownership record */
@@ -262,12 +272,12 @@ interface NaijaFaker {
   /**
    * Generate a detailed person with education, work, and vehicle records
    */
-  detailedPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): DetailedPerson;
+  detailedPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female", options?: AgeRange): DetailedPerson;
 
   /**
    * Generate multiple detailed persons
    */
-  detailedPeople(number?: number, language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): DetailedPerson[];
+  detailedPeople(number?: number, language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female", options?: AgeRange): DetailedPerson[];
 
   /**
    * Generate a Nigerian title/honorific
@@ -322,12 +332,12 @@ interface NaijaFaker {
   /**
    * Generate a fake education record
    */
-  educationRecord(language?: "yoruba" | "igbo" | "hausa", age?: number): EducationRecord;
+  educationRecord(language?: "yoruba" | "igbo" | "hausa", age?: number): EducationRecord | null;
 
   /**
    * Generate a fake work/employment record
    */
-  workRecord(age?: number, graduationYear?: number, discipline?: string): WorkRecord;
+  workRecord(age?: number, graduationYear?: number): WorkRecord;
 
   /**
    * Generate a fake vehicle record
@@ -337,7 +347,7 @@ interface NaijaFaker {
   /**
    * Generate a fake date of birth with age
    */
-  dateOfBirth(options?: { minAge?: number; maxAge?: number }): { date: string; age: number };
+  dateOfBirth(options?: AgeRange): { date: string; age: number };
 
   /**
    * Generate a random marital status

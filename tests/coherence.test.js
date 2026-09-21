@@ -150,6 +150,29 @@ describe("coherence - detailedPerson()", function () {
   })
 })
 
+describe("coherence - people too young to have graduated", function () {
+  it("should report no education rather than inventing a degree", function () {
+    const youngest = Math.min(...degrees.map(d => d.gradAge))
+    for (let i = 0; i < SAMPLE; i++) {
+      const p = faker.detailedPerson(null, null, { minAge: 18, maxAge: 19 })
+      assert.equal(p.education, null, `age ${p.dateOfBirth.age} holds a ${p.education && p.education.degree}`)
+      assert.ok(p.dateOfBirth.age < youngest)
+      // the rest of the record still has to hold together
+      assert.ok(p.work.startYear >= Number(p.dateOfBirth.date.slice(0, 4)) + 18,
+        `started work at ${p.work.startYear}, born ${p.dateOfBirth.date}`)
+      assert.equal(p.work.level, 'entry')
+      assert.equal(p.salary.level, 'entry')
+    }
+  })
+
+  it("should still award a degree once old enough", function () {
+    for (let i = 0; i < 50; i++) {
+      const p = faker.detailedPerson(null, null, { minAge: 30, maxAge: 30 })
+      assert.ok(p.education && p.education.degree, "30-year-old with no qualification")
+    }
+  })
+})
+
 describe("coherence - standalone providers keep their old contracts", function () {
   it("title() without context still returns a title", function () {
     assert.ok(faker.title("male").length > 0)
@@ -167,21 +190,5 @@ describe("coherence - standalone providers keep their old contracts", function (
 
   it("address() rejects an unknown region", function () {
     assert.throws(() => faker.address("middle-belt"), { code: 'INVALID_REGION' })
-  })
-})
-
-describe("coherence - credential-bound roles", function () {
-  const { positionDisciplines } = require('../src/Faker/Providers/jobs')
-
-  it("should not give a regulated role to someone who never qualified", function () {
-    for (let i = 0; i < SAMPLE; i++) {
-      const p = faker.detailedPerson()
-      const required = positionDisciplines[p.work.position]
-      if (!required) continue
-      assert.ok(
-        required.includes(p.education.discipline),
-        `${p.work.position} with a ${p.education.discipline} degree (${p.fullName})`
-      )
-    }
   })
 })

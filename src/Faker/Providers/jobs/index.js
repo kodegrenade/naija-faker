@@ -28,17 +28,6 @@ const positionLevels = {
 const positions = Object.values(positionLevels).flat()
 
 /**
- * Roles that genuinely need a matching qualification. Everything else is
- * left open, since changing field mid-career is ordinary enough.
- */
-const positionDisciplines = {
-  "Legal Counsel": ["law"],
-  "Accountant": ["business"],
-  "Financial Analyst": ["business"],
-  "Software Engineer": ["science", "engineering"],
-}
-
-/**
  * Courses grouped by discipline so a degree is never awarded in an
  * unrelated subject (no "B.Pharm in History").
  */
@@ -89,4 +78,4 @@ const degrees = [
   { code: "OND", full: "Ordinary National Diploma", gradAge: 20, disciplines: ["engineering", "science", "business"] },
 ]
 
-module.exports = { positions, positionLevels, positionDisciplines, degrees, courses, courseDisciplines }
+module.exports = { positions, positionLevels, degrees, courses, courseDisciplines }

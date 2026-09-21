@@ -243,12 +243,15 @@ faker.educationRecord("yoruba")
 // so there is no "B.Pharm in History".
 faker.educationRecord("yoruba", 27)
 
+// Too young to have finished anything → null, rather than an invented degree
+faker.educationRecord("yoruba", 18) // → null
+
 faker.workRecord()
 // → { company: 'Pan-African Solutions Ltd', position: 'Senior Analyst', industry: 'Technology', startYear: 2019, yearsOfExperience: 7, level: 'mid' }
 
-// Pass an age, graduation year and discipline: the job starts after the degree,
-// seniority is capped by experience, and regulated roles need the qualification
-faker.workRecord(30, 2018, "law")
+// Pass an age and graduation year: the job starts after the degree, and
+// seniority, position and salary band all follow years of experience
+faker.workRecord(30, 2018)
 
 faker.vehicleRecord("Lagos")
 // → { licensePlate: 'LAG-234XY', make: 'Toyota', model: 'Corolla', year: 2021, color: 'Silver' }
@@ -318,12 +321,21 @@ faker.detailedPerson("yoruba", "male")
 faker.detailedPeople(5, "igbo", "female")
 ```
 
+Detailed people are 22 to 65 by default, since the record carries a degree and a
+job. Widen it and the young are represented honestly — `education` is `null`
+rather than a qualification they could not have finished:
+
+```javascript
+faker.detailedPerson("igbo", "female", { minAge: 18, maxAge: 24 })
+// → an 18-year-old comes back with education: null, entry-level work and pay
+```
+
 Every field of a detailed person is derived from one identity rather than drawn
 independently, so the record holds together:
 
 - the title matches the ethnic group, the age, the marital status and the qualification — no Igbo `Emir`, no 24-year-old `Prof.`, no single `Mrs.`
 - graduation comes after birth at a plausible age for the degree, and never in the future
-- employment starts after graduation, and seniority, position and salary band all follow years of experience
+- employment starts after graduation (or after turning 18, for those with no degree yet), and seniority, position and salary band all follow years of experience
 - marital status and the next of kin's relationship fit the age — no widowed 19-year-olds, no 25-year-old whose next of kin is their son
 - the next of kin shares the family name and lives in the same part of the country
 - `Oba`, `Igwe` and `Emir` stay rare instead of turning up in 1 record in 15
