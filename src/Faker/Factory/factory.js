@@ -19,12 +19,12 @@ const { networks, prefix } = require('../Providers/numbers')
 /**
  * Address Provider
  */
-const { types, suffixes, locale, places, names } = require('../Providers/address')
+const { types, suffixes, locale, places } = require('../Providers/address')
 
 /**
  * Title Provider
  */
-const { maleTitles, femaleTitles } = require('../Providers/title')
+const { maleTitles, femaleTitles, titleRules } = require('../Providers/title')
 
 /**
  * Email Provider
@@ -64,7 +64,7 @@ const { vehicleMakes, vehicleColors } = require('../Providers/vehicles')
 /**
  * Jobs Provider
  */
-const { positions, degrees, courses } = require('../Providers/jobs')
+const { positionLevels, degrees, courseDisciplines } = require('../Providers/jobs')
 
 /**
  * Medical Provider
@@ -165,6 +165,26 @@ class Factory {
   }
 
   /**
+   * Picks a random element from a list
+   * @private
+   */
+  static _pick(list) {
+    return list[Math.floor(this._random() * list.length)]
+  }
+
+  /**
+   * Resolves language and gender once so every field of a record is drawn
+   * against the same identity, instead of each provider re-rolling its own.
+   * @private
+   * @returns {object} { lang, gen }
+   */
+  static _resolve(language, gender) {
+    const lang = (language ? language.trim() : (this.language || this._pick(["yoruba", "hausa", "igbo"]))).toLowerCase()
+    const gen = (gender ? gender.trim() : (this.gender || this._pick(["male", "female"]))).toLowerCase()
+    return { lang, gen }
+  }
+
+  /**
    * Generates fake name
    * 
    * @param {string} language 
@@ -172,13 +192,7 @@ class Factory {
    * @returns {string}
    */
   static name(language, gender) {
-    const languageOptions = ["yoruba", "hausa", "igbo",]
-    const genderOptions = ["male", "female"]
-
-    let languagePicked = (language)
-      ? language.trim() : (this.language ? this.language : languageOptions[Math.floor(this._random() * languageOptions.length)])
-    let genderPicked = (gender)
-      ? gender.trim() : (this.gender ? this.gender : genderOptions[Math.floor(this._random() * genderOptions.length)])
+    const { lang: languagePicked, gen: genderPicked } = this._resolve(language, gender)
 
     let firstName;
     let lastName;
@@ -231,10 +245,11 @@ class Factory {
    * @returns {object} person
    */
   static person(language, gender) {
-    let fullName = this.name(language || null, gender || null)
-    let splitName = fullName.split(" ")
+    const { lang, gen } = this._resolve(language, gender)
+    const fullName = this.name(lang, gen)
+    const splitName = fullName.split(" ")
     return {
-      title: this.title(gender),
+      title: this.title(gen, { language: lang }),
       firstName: splitName[0],
       lastName: splitName[1],
       fullName: fullName,
@@ -264,32 +279,43 @@ class Factory {
   }
 
   /**
-   * Generates fake title
+   * Generates a fake title, filtered against the identity it belongs to.
+   * Without context every title is eligible, except the traditional-ruler
+   * ones which stay rare.
    * 
+   * @param {string} gender - "male" or "female"
+   * @param {object} context - Optional { language, age, maritalStatus, degree, discipline }
    * @returns {string} title
    */
-  static title(gender) {
-    const genders = ["male", "female"]
-    let selectedGender = (gender)
-      ? gender.trim() : (this.gender ? this.gender
-        : genders[Math.floor(this._random() * genders.length)])
+  static title(gender, context) {
+    const selectedGender = (gender
+      ? gender.trim()
+      : (this.gender || this._pick(["male", "female"]))).toLowerCase()
 
-    selectedGender = selectedGender.toLowerCase();
-    let title;
+    let pool
+    if (selectedGender === "male") pool = maleTitles
+    else if (selectedGender === "female") pool = femaleTitles
+    else return "no title selected"
 
-    switch (selectedGender) {
-      case "male":
-        title = maleTitles[Math.floor(this._random() * maleTitles.length)]
-        return title
-        break;
-      case "female":
-        title = femaleTitles[Math.floor(this._random() * femaleTitles.length)]
-        return title
-        break;
-      default:
-        return "no title selected"
-        break;
-    }
+    const { language, age, maritalStatus, degree, discipline } = context || {}
+    const lang = language ? language.trim().toLowerCase() : null
+
+    const eligible = pool.filter(name => {
+      const rule = titleRules[name]
+      if (!rule) return true
+      if (rule.rare && this._random() > 0.02) return false
+      if (lang && rule.languages && !rule.languages.includes(lang)) return false
+      if (typeof age === 'number' && rule.minAge !== undefined && age < rule.minAge) return false
+      if (typeof age === 'number' && rule.maxAge !== undefined && age > rule.maxAge) return false
+      if (maritalStatus && rule.maritalStatus && !rule.maritalStatus.includes(maritalStatus)) return false
+      if (degree && rule.degrees && !rule.degrees.includes(degree)) return false
+      if (discipline && rule.disciplines && !rule.disciplines.includes(discipline)) return false
+      return true
+    })
+
+    // Every title ruled out (e.g. a very young person): fall back to the plain one
+    if (eligible.length === 0) return (selectedGender === "male") ? "Mr." : "Ms."
+    return this._pick(eligible)
   }
 
   /**
@@ -311,21 +337,22 @@ class Factory {
   /**
    * Generates fake address
    * 
+   * @param {string} region - Optional "east", "west", "north" or "south".
+   *                          Random when omitted.
    * @returns {string} address
    */
-  static address() {
-    const addressType = types[Math.floor(this._random() * types.length)];
-    const addressLocale = locale[Math.floor(this._random() * locale.length)];
+  static address(region) {
+    const addressLocale = region ? region.trim().toLowerCase() : this._pick(locale)
     const placeList = places[0][addressLocale]
-    const addressName = (addressLocale) == "east"
-      ? this.name("igbo") : (addressLocale == "west"
-        ? this.name("yoruba") : (addressLocale == "south"
-          ? this.name("igbo") : this.name("hausa")))
+    if (!placeList) {
+      throw new NaijaFakerError(`Invalid region: "${region}". Use "east", "west", "north", or "south".`, 'INVALID_REGION')
+    }
+    const addressType = this._pick(types)
+    const addressName = this.name(regionMap[addressLocale].language)
     const number = Math.floor((this._random() * 200) + 1)
-    const addressSuffix = suffixes[Math.floor(this._random() * suffixes.length)]
-    const addressPlace = placeList[Math.floor(this._random() * placeList.length)]
-    const fullAddress = `${addressSuffix} ${number}, ${addressName} ${addressType}, ${addressPlace}`
-    return fullAddress.trim()
+    const addressSuffix = this._pick(suffixes)
+    const addressPlace = this._pick(placeList)
+    return `${addressSuffix} ${number}, ${addressName} ${addressType}, ${addressPlace}`.trim()
   }
 
   /**
@@ -436,20 +463,12 @@ class Factory {
    * 
    * @param {string} language - "yoruba", "igbo", or "hausa" (optional, random if not set)
    * @param {string} gender - "male" or "female" (optional, random if not set)
-   * @returns {object} Consistent person with state and lga fields
+   * @param {object} profile - Optional { age, maritalStatus, degree, discipline }
+   *                           used to keep the title plausible
+   * @returns {object} Consistent person with language, region, state and lga fields
    */
-  static consistentPerson(language, gender) {
-    const languageOptions = ["yoruba", "hausa", "igbo"]
-    const genderOptions = ["male", "female"]
-
-    let lang = (language)
-      ? language.trim().toLowerCase()
-      : (this.language ? this.language
-        : languageOptions[Math.floor(this._random() * languageOptions.length)])
-    let gen = (gender)
-      ? gender.trim().toLowerCase()
-      : (this.gender ? this.gender
-        : genderOptions[Math.floor(this._random() * genderOptions.length)])
+  static consistentPerson(language, gender, profile) {
+    const { lang, gen } = this._resolve(language, gender)
 
     // Get matching regions for this language
     const regions = languageToRegions[lang]
@@ -457,36 +476,25 @@ class Factory {
       throw new NaijaFakerError('Invalid language. Use "yoruba", "igbo", or "hausa".', 'INVALID_LANGUAGE')
     }
 
-    const region = regions[Math.floor(this._random() * regions.length)]
-    const regionData = regionMap[region]
-    const state = regionData.states[Math.floor(this._random() * regionData.states.length)]
+    const region = this._pick(regions)
+    const state = this._pick(regionMap[region].states)
     const lgaList = stateLgas[state]
-    const lga = lgaList
-      ? lgaList[Math.floor(this._random() * lgaList.length)]
-      : null
-
-    // Get address from the matching region
-    const addressPlaces = places[0][region]
-    const addressType = types[Math.floor(this._random() * types.length)]
-    const addressSuffix = suffixes[Math.floor(this._random() * suffixes.length)]
-    const addressNumber = Math.floor((this._random() * 200) + 1)
-    const addressName = this.name(lang)
-    const addressPlace = addressPlaces[Math.floor(this._random() * addressPlaces.length)]
-    const fullAddress = `${addressSuffix} ${addressNumber}, ${addressName} ${addressType}, ${addressPlace}`.trim()
+    const lga = lgaList ? this._pick(lgaList) : null
 
     const fullName = this.name(lang, gen)
     const splitName = fullName.split(' ')
-
     return {
-      title: this.title(gen),
+      title: this.title(gen, { ...(profile || {}), language: lang }),
       firstName: splitName[0],
       lastName: splitName[1],
       fullName: fullName,
       email: this.email(fullName),
       phone: this.phoneNumber(),
-      address: fullAddress,
+      address: this.address(region),
       state: state,
       lga: lga,
+      language: lang,
+      region: region,
     }
   }
 
@@ -572,9 +580,13 @@ class Factory {
    * Generates a fake education record
    * 
    * @param {string} language - Optional language to filter universities by region
-   * @returns {object} { university, abbreviation, degree, course, graduationYear }
+   * @param {number} age - Optional current age; keeps the degree and the
+   *                       graduation year behind the date of birth
+   * @returns {object|null} { university, abbreviation, degree, discipline, course,
+   *                          graduationYear }, or null if too young to have finished
+   *                          any qualification
    */
-  static educationRecord(language) {
+  static educationRecord(language, age) {
     let uni
 
     if (language) {
@@ -593,15 +605,28 @@ class Factory {
       uni = universities[Math.floor(this._random() * universities.length)]
     }
 
-    const degree = degrees[Math.floor(this._random() * degrees.length)]
-    const course = courses[Math.floor(this._random() * courses.length)]
     const currentYear = new Date().getFullYear()
-    const graduationYear = currentYear - Math.floor(this._random() * 20) - 1
+    const hasAge = typeof age === 'number'
+
+    // Only award a qualification the person has lived long enough to finish.
+    // Too young for any of them and they simply do not have one yet.
+    const affordable = hasAge ? degrees.filter(d => age >= d.gradAge) : degrees
+    if (affordable.length === 0) return null
+
+    const degree = this._pick(affordable)
+    const discipline = this._pick(degree.disciplines)
+    const course = this._pick(courseDisciplines[discipline])
+
+    // Graduated no earlier than the year they finished that degree, never in the future
+    const latest = hasAge ? currentYear : currentYear - 1
+    const earliest = hasAge ? Math.min(currentYear - age + degree.gradAge, latest) : currentYear - 21
+    const graduationYear = earliest + Math.floor(this._random() * (latest - earliest + 1))
 
     return {
       university: uni.name,
       abbreviation: uni.abbreviation,
       degree: degree.code,
+      discipline: discipline,
       course: course,
       graduationYear: graduationYear,
     }
@@ -610,19 +635,35 @@ class Factory {
   /**
    * Generates a fake work/employment record
    * 
-   * @returns {object} { company, position, industry, startYear }
+   * @param {number} age - Optional current age; nobody starts work before 18
+   * @param {number} graduationYear - Optional; the job starts after the degree
+   *                                  and seniority is measured from it
+   * @returns {object} { company, position, industry, startYear, yearsOfExperience, level }
    */
-  static workRecord() {
+  static workRecord(age, graduationYear) {
     const comp = this.company()
-    const position = positions[Math.floor(this._random() * positions.length)]
     const currentYear = new Date().getFullYear()
-    const startYear = currentYear - Math.floor(this._random() * 15)
+
+    let earliest = currentYear - 15
+    if (typeof graduationYear === 'number') earliest = graduationYear
+    else if (typeof age === 'number') earliest = currentYear - age + 18
+    earliest = Math.min(earliest, currentYear)
+    const startYear = earliest + Math.floor(this._random() * (currentYear - earliest + 1))
+
+    // Seniority follows the whole career, not just the current job
+    const careerStart = (typeof graduationYear === 'number') ? graduationYear : startYear
+    const yearsOfExperience = currentYear - careerStart
+    const level = yearsOfExperience < 3 ? 'entry'
+      : yearsOfExperience < 8 ? 'mid'
+        : yearsOfExperience < 15 ? 'senior' : 'executive'
 
     return {
       company: comp.name,
-      position: position,
+      position: this._pick(positionLevels[level]),
       industry: comp.industry,
       startYear: startYear,
+      yearsOfExperience: yearsOfExperience,
+      level: level,
     }
   }
 
@@ -655,34 +696,46 @@ class Factory {
    * 
    * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
    * @param {string} gender - "male" or "female" (optional)
+   * @param {object} options - Optional { minAge, maxAge }, defaults 22 and 65.
+   *                           Below 22 the person may not hold a qualification yet
+   *                           and `education` is null.
    * @returns {object} Rich identity with person + personal data + education + work + vehicle
    */
-  static detailedPerson(language, gender) {
-    const person = this.consistentPerson(language || null, gender || null)
+  static detailedPerson(language, gender, options) {
+    // Resolve the identity first; every record below is derived from it
+    // rather than drawn independently.
+    const { lang, gen } = this._resolve(language, gender)
 
-    // Determine language for regional university matching
-    const langOptions = ["yoruba", "hausa", "igbo"]
-    const lang = (language)
-      ? language.trim().toLowerCase()
-      : (this.language ? this.language
-        : langOptions[Math.floor(this._random() * langOptions.length)])
+    const dateOfBirth = this.dateOfBirth({ minAge: 22, maxAge: 65, ...options })
+    const maritalStatus = this.maritalStatus(dateOfBirth.age)
 
-    const education = this.educationRecord(lang)
-    const work = this.workRecord()
+    // Education comes first: the title has to match the qualification
+    const education = this.educationRecord(lang, dateOfBirth.age)
+    const person = this.consistentPerson(lang, gen, {
+      age: dateOfBirth.age,
+      maritalStatus: maritalStatus,
+      degree: education && education.degree,
+      discipline: education && education.discipline,
+    })
+    const work = this.workRecord(dateOfBirth.age, education && education.graduationYear)
     const vehicle = this.vehicleRecord(person.state)
 
-    // Determine the opposite gender for next of kin variety
-    const personGender = gender ? gender.trim().toLowerCase() : null
-    const kinGender = (personGender === 'male') ? 'female' : (personGender === 'female') ? 'male' : null
+    // Next of kin is the opposite gender for variety
+    const kinGender = (gen === 'male') ? 'female' : 'male'
 
     return {
       ...person,
-      dateOfBirth: this.dateOfBirth(),
-      maritalStatus: this.maritalStatus(),
+      dateOfBirth: dateOfBirth,
+      maritalStatus: maritalStatus,
       bloodGroup: this.bloodGroup(),
       genotype: this.genotype(),
-      salary: this.salary(),
-      nextOfKin: this.nextOfKin(lang, kinGender),
+      salary: this.salary({ level: work.level }),
+      nextOfKin: this.nextOfKin(lang, kinGender, {
+        age: dateOfBirth.age,
+        maritalStatus: maritalStatus,
+        region: person.region,
+        lastName: person.lastName,
+      }),
       education: education,
       work: work,
       vehicle: vehicle,
@@ -695,16 +748,17 @@ class Factory {
    * @param {number} number - Number of people (default: 10)
    * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
    * @param {string} gender - "male" or "female" (optional)
+   * @param {object} options - Optional { minAge, maxAge }, as detailedPerson()
    * @returns {array} Array of detailed person objects
    */
-  static detailedPeople(number, language, gender) {
+  static detailedPeople(number, language, gender, options) {
     let count = (number !== undefined && number !== null) ? number : 10
     if (typeof count !== 'number' || count < 1 || !Number.isInteger(count)) {
       throw new NaijaFakerError('Count must be a positive integer.', 'INVALID_PARAM')
     }
     let list = []
     for (let index = 0; index < count; index++) {
-      const data = this.detailedPerson(language || null, gender || null)
+      const data = this.detailedPerson(language || null, gender || null, options)
       list.push(data)
     }
     return list
@@ -732,11 +786,13 @@ class Factory {
 
     const age = minAge + Math.floor(this._random() * (maxAge - minAge + 1))
 
+    // Pick a day inside the window where the person is exactly `age` today,
+    // so the date is always real and always agrees with the age.
     const now = new Date()
-    const birthYear = now.getFullYear() - age
-    const month = Math.floor(this._random() * 12)
-    const day = Math.floor(this._random() * 28) + 1
-    const date = new Date(birthYear, month, day)
+    const newest = new Date(now.getFullYear() - age, now.getMonth(), now.getDate())
+    const oldest = new Date(now.getFullYear() - age - 1, now.getMonth(), now.getDate() + 1)
+    const span = Math.floor((newest - oldest) / 86400000)
+    const date = new Date(oldest.getFullYear(), oldest.getMonth(), oldest.getDate() + Math.floor(this._random() * (span + 1)))
 
     const yyyy = date.getFullYear()
     const mm = String(date.getMonth() + 1).padStart(2, '0')
@@ -751,11 +807,21 @@ class Factory {
   /**
    * Generates a random marital status
    * 
+   * @param {number} age - Optional current age; statuses that take years to
+   *                       reach are excluded below their plausible age
    * @returns {string} Marital status
    */
-  static maritalStatus() {
-    const statuses = ["Single", "Married", "Divorced", "Widowed", "Separated"]
-    return statuses[Math.floor(this._random() * statuses.length)]
+  static maritalStatus(age) {
+    const statuses = [
+      { status: "Single" },
+      { status: "Married", minAge: 21 },
+      { status: "Separated", minAge: 25 },
+      { status: "Divorced", minAge: 27 },
+      { status: "Widowed", minAge: 35 },
+    ]
+    const eligible = statuses.filter(s =>
+      typeof age !== 'number' || s.minAge === undefined || age >= s.minAge)
+    return this._pick(eligible).status
   }
 
   /**
@@ -809,26 +875,50 @@ class Factory {
    * 
    * @param {string} language - "yoruba", "igbo", or "hausa" (optional)
    * @param {string} gender - "male" or "female" for the kin (optional)
+   * @param {object} profile - Optional { age, maritalStatus, region, lastName }
+   *                           of the person the kin belongs to
    * @returns {object} { fullName, relationship, phone, address }
    */
-  static nextOfKin(language, gender) {
-    const maleRelationships = ["Father", "Brother", "Spouse", "Uncle", "Son"]
-    const femaleRelationships = ["Mother", "Sister", "Spouse", "Aunt", "Daughter"]
+  static nextOfKin(language, gender, profile) {
+    // minAge: the person must be old enough to have this relative
+    // maxAge: beyond this the relative is unlikely to still be living
+    const relationships = {
+      male: [
+        { name: "Father", maxAge: 60 },
+        { name: "Brother" },
+        { name: "Uncle" },
+        { name: "Spouse", requiresMarried: true },
+        { name: "Son", minAge: 38 },
+      ],
+      female: [
+        { name: "Mother", maxAge: 60 },
+        { name: "Sister" },
+        { name: "Aunt" },
+        { name: "Spouse", requiresMarried: true },
+        { name: "Daughter", minAge: 38 },
+      ],
+    }
 
-    const genderOptions = ["male", "female"]
-    const gen = (gender)
-      ? gender.trim().toLowerCase()
-      : genderOptions[Math.floor(this._random() * genderOptions.length)]
+    const gen = (gender ? gender.trim() : this._pick(["male", "female"])).toLowerCase()
+    const { age, maritalStatus, region, lastName } = profile || {}
 
-    const relationships = (gen === "female") ? femaleRelationships : maleRelationships
-    const relationship = relationships[Math.floor(this._random() * relationships.length)]
-    const fullName = this.name(language || null, gen)
+    const eligible = relationships[gen === "female" ? "female" : "male"].filter(r => {
+      if (r.requiresMarried && maritalStatus && maritalStatus !== "Married") return false
+      if (typeof age === 'number' && r.minAge !== undefined && age < r.minAge) return false
+      if (typeof age === 'number' && r.maxAge !== undefined && age > r.maxAge) return false
+      return true
+    })
+    const relationship = this._pick(eligible).name
+
+    // Relatives share the family name and, usually, the family's part of the country
+    const kinName = this.name(language || null, gen)
+    const fullName = lastName ? `${kinName.split(' ')[0]} ${lastName}` : kinName
 
     return {
       fullName: fullName,
       relationship: relationship,
       phone: this.phoneNumber(),
-      address: this.address(),
+      address: this.address(region || null),
     }
   }
 

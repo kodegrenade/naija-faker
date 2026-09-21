@@ -9,6 +9,7 @@ const banks = [
   { name: "Fidelity Bank", code: "070" },
   { name: "First Bank of Nigeria", code: "011" },
   { name: "First City Monument Bank", code: "214" },
+  { name: "Flutterwave MFB", code: "90567" },
   { name: "Globus Bank", code: "103" },
   { name: "Guaranty Trust Bank", code: "058" },
   { name: "Heritage Bank", code: "030" },
@@ -18,7 +19,8 @@ const banks = [
   { name: "Opay", code: "100004" },
   { name: "Palmpay", code: "100033" },
   { name: "Polaris Bank", code: "076" },
-  { name: "Providus Bank", code: "101" },
+  { name: "ProvidusUnity Bank", code: "101" },
+  { name: "Paystack-Titan", code: "100039" },
   { name: "Stanbic IBTC Bank", code: "221" },
   { name: "Standard Chartered Bank", code: "068" },
   { name: "Sterling Bank", code: "232" },
@@ -26,9 +28,9 @@ const banks = [
   { name: "Titan Trust Bank", code: "102" },
   { name: "Union Bank of Nigeria", code: "032" },
   { name: "United Bank for Africa", code: "033" },
-  { name: "Unity Bank", code: "215" },
   { name: "Wema Bank", code: "035" },
   { name: "Zenith Bank", code: "057" },
+  { name: "PAYSTACK MFB", code: "90986" },
 ]
 
 module.exports = { banks }

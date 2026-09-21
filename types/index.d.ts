@@ -47,6 +47,50 @@ interface ConsistentPerson extends Person {
   state: string;
   /** Local Government Area within the person's state */
   lga: string | null;
+  /** Language the person's name and title were drawn from */
+  language: "yoruba" | "igbo" | "hausa";
+  /** Region the person's state and address belong to */
+  region: "east" | "west" | "north" | "south";
+}
+
+/**
+ * Age bounds, as accepted by dateOfBirth() and detailedPerson()
+ */
+interface AgeRange {
+  /** Youngest age to generate (default 18, or 22 for detailedPerson) */
+  minAge?: number;
+  /** Oldest age to generate (default 65) */
+  maxAge?: number;
+}
+
+/**
+ * Identity context used to keep a generated title plausible
+ */
+interface TitleContext {
+  /** "yoruba", "igbo" or "hausa" - filters out other groups' titles */
+  language?: "yoruba" | "igbo" | "hausa";
+  /** Current age - filters out titles the person is too young or old for */
+  age?: number;
+  /** Marital status - e.g. "Mrs." is not used for a single person */
+  maritalStatus?: string;
+  /** Degree code - e.g. "Prof." requires a Ph.D */
+  degree?: string;
+  /** Field of study - e.g. "Engr." requires an engineering degree */
+  discipline?: string;
+}
+
+/**
+ * Context of the person a next of kin belongs to
+ */
+interface KinProfile {
+  /** The person's age - rules out relatives they are too young to have */
+  age?: number;
+  /** The person's marital status - a spouse requires "Married" */
+  maritalStatus?: string;
+  /** Region to place the kin's address in */
+  region?: "east" | "west" | "north" | "south";
+  /** The person's surname, shared with the relative */
+  lastName?: string;
 }
 
 /**
@@ -65,8 +109,8 @@ interface DetailedPerson extends ConsistentPerson {
   salary: { amount: number; currency: string; level: string; frequency: string };
   /** Next of kin information */
   nextOfKin: { fullName: string; relationship: string; phone: string; address: string };
-  /** Education record */
-  education: EducationRecord;
+  /** Education record, or null if too young to have finished a qualification */
+  education: EducationRecord | null;
   /** Work/employment record */
   work: WorkRecord;
   /** Vehicle ownership record */
@@ -121,9 +165,11 @@ interface EducationRecord {
   abbreviation: string;
   /** Degree code (e.g., "B.Sc", "M.Sc", "Ph.D") */
   degree: string;
-  /** Course of study */
+  /** Field the degree was awarded in (e.g., "engineering", "law") */
+  discipline: string;
+  /** Course of study, always within the degree's discipline */
   course: string;
-  /** Year of graduation */
+  /** Year of graduation - after the date of birth, never in the future */
   graduationYear: number;
 }
 
@@ -137,8 +183,12 @@ interface WorkRecord {
   position: string;
   /** Industry sector */
   industry: string;
-  /** Year employment started */
+  /** Year employment started - never before graduating */
   startYear: number;
+  /** Years since the career began, measured from graduation */
+  yearsOfExperience: number;
+  /** Seniority implied by the experience, and the band the salary is drawn from */
+  level: "entry" | "mid" | "senior" | "executive";
 }
 
 /**
@@ -212,7 +262,7 @@ interface NaijaFaker {
   /**
    * Generate a geographically consistent fake Nigerian person
    */
-  consistentPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): ConsistentPerson;
+  consistentPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female", profile?: TitleContext): ConsistentPerson;
 
   /**
    * Generate multiple geographically consistent fake Nigerian persons
@@ -222,17 +272,17 @@ interface NaijaFaker {
   /**
    * Generate a detailed person with education, work, and vehicle records
    */
-  detailedPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): DetailedPerson;
+  detailedPerson(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female", options?: AgeRange): DetailedPerson;
 
   /**
    * Generate multiple detailed persons
    */
-  detailedPeople(number?: number, language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): DetailedPerson[];
+  detailedPeople(number?: number, language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female", options?: AgeRange): DetailedPerson[];
 
   /**
    * Generate a Nigerian title/honorific
    */
-  title(gender?: "male" | "female"): string;
+  title(gender?: "male" | "female", context?: TitleContext): string;
 
   /**
    * Generate a fake email address
@@ -242,7 +292,7 @@ interface NaijaFaker {
   /**
    * Generate a fake Nigerian street address
    */
-  address(): string;
+  address(region?: "east" | "west" | "north" | "south"): string;
 
   /**
    * Generate a fake Nigerian phone number
@@ -282,12 +332,12 @@ interface NaijaFaker {
   /**
    * Generate a fake education record
    */
-  educationRecord(language?: "yoruba" | "igbo" | "hausa"): EducationRecord;
+  educationRecord(language?: "yoruba" | "igbo" | "hausa", age?: number): EducationRecord | null;
 
   /**
    * Generate a fake work/employment record
    */
-  workRecord(): WorkRecord;
+  workRecord(age?: number, graduationYear?: number): WorkRecord;
 
   /**
    * Generate a fake vehicle record
@@ -297,12 +347,12 @@ interface NaijaFaker {
   /**
    * Generate a fake date of birth with age
    */
-  dateOfBirth(options?: { minAge?: number; maxAge?: number }): { date: string; age: number };
+  dateOfBirth(options?: AgeRange): { date: string; age: number };
 
   /**
    * Generate a random marital status
    */
-  maritalStatus(): string;
+  maritalStatus(age?: number): string;
 
   /**
    * Generate a random blood group
@@ -322,7 +372,7 @@ interface NaijaFaker {
   /**
    * Generate a fake next of kin
    */
-  nextOfKin(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female"): { fullName: string; relationship: string; phone: string; address: string };
+  nextOfKin(language?: "yoruba" | "igbo" | "hausa", gender?: "male" | "female", profile?: KinProfile): { fullName: string; relationship: string; phone: string; address: string };
 
   /**
    * Export generated data as JSON or CSV string
