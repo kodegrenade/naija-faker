@@ -65,6 +65,7 @@ faker.title() // Mrs.
 faker.name() // Temilade Abolade
 
 faker.address() // 45, Alhaji Kazeem Street, Kaduna
+faker.address("west") // Plot 12, Adebayo Ogunlesi Avenue, Ibadan
 
 faker.phoneNumber() // 09123456634
 
@@ -194,8 +195,19 @@ faker.consistentPerson("yoruba", "male")
   phone: '+2348031234567',
   address: 'Plot 45, Oluwaseun Adedayo Street, Ibadan',
   state: 'Oyo',
-  lga: 'Ibadan North'
+  lga: 'Ibadan North',
+  language: 'yoruba',
+  region: 'west'
 }
+```
+
+Titles are filtered against the identity too, so an Igbo person is never an
+`Emir` and a Yoruba person is never an `Igwe`. Pass an optional profile to
+narrow it further:
+
+```javascript
+faker.consistentPerson("igbo", "female", { age: 29, maritalStatus: "Single" })
+// → never "Mrs.", never "Chief" (too young), never "Alhaja" (wrong group)
 ```
 
 ```javascript
@@ -224,10 +236,19 @@ faker.university()
 
 ```javascript
 faker.educationRecord("yoruba")
-// → { university: 'University of Lagos', abbreviation: 'UNILAG', degree: 'B.Sc', course: 'Computer Science', graduationYear: 2019 }
+// → { university: 'University of Lagos', abbreviation: 'UNILAG', degree: 'B.Sc', discipline: 'science', course: 'Computer Science', graduationYear: 2019 }
+
+// Pass an age and the degree is one the person lived long enough to earn,
+// awarded in a year after their birth. The course always fits the degree,
+// so there is no "B.Pharm in History".
+faker.educationRecord("yoruba", 27)
 
 faker.workRecord()
-// → { company: 'Pan-African Solutions Ltd', position: 'Senior Analyst', industry: 'Technology', startYear: 2019 }
+// → { company: 'Pan-African Solutions Ltd', position: 'Senior Analyst', industry: 'Technology', startYear: 2019, yearsOfExperience: 7, level: 'mid' }
+
+// Pass an age, graduation year and discipline: the job starts after the degree,
+// seniority is capped by experience, and regulated roles need the qualification
+faker.workRecord(30, 2018, "law")
 
 faker.vehicleRecord("Lagos")
 // → { licensePlate: 'LAG-234XY', make: 'Toyota', model: 'Corolla', year: 2021, color: 'Silver' }
@@ -270,6 +291,7 @@ faker.detailedPerson("yoruba", "male")
     university: 'University of Ibadan',
     abbreviation: 'UI',
     degree: 'B.Sc',
+    discipline: 'science',
     course: 'Computer Science',
     graduationYear: 2019
   },
@@ -277,7 +299,9 @@ faker.detailedPerson("yoruba", "male")
     company: 'Pan-African Solutions Ltd',
     position: 'Software Engineer',
     industry: 'Technology',
-    startYear: 2020
+    startYear: 2020,
+    yearsOfExperience: 7,
+    level: 'mid'
   },
   vehicle: {
     licensePlate: 'OYO-234XY',
@@ -293,6 +317,19 @@ faker.detailedPerson("yoruba", "male")
 // Generate multiple detailed people
 faker.detailedPeople(5, "igbo", "female")
 ```
+
+Every field of a detailed person is derived from one identity rather than drawn
+independently, so the record holds together:
+
+- the title matches the ethnic group, the age, the marital status and the qualification — no Igbo `Emir`, no 24-year-old `Prof.`, no single `Mrs.`
+- graduation comes after birth at a plausible age for the degree, and never in the future
+- employment starts after graduation, and seniority, position and salary band all follow years of experience
+- marital status and the next of kin's relationship fit the age — no widowed 19-year-olds, no 25-year-old whose next of kin is their son
+- the next of kin shares the family name and lives in the same part of the country
+- `Oba`, `Igwe` and `Emir` stay rare instead of turning up in 1 record in 15
+
+Called on their own, the individual providers keep their old, unconstrained
+behaviour — the sanity rules apply to the context you give them.
 
 ## Personal Data
 
@@ -388,6 +425,7 @@ try {
 | `INVALID_GENDER` | `config()` |
 | `INVALID_NETWORK` | `phoneNumber()`, `config()` |
 | `INVALID_STATE` | `licensePlate()` |
+| `INVALID_REGION` | `address()` |
 | `INVALID_BANK` | `bankAccount()` |
 | `INVALID_LEVEL` | `salary()` |
 | `INVALID_TYPE` | `export()` |
